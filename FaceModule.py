@@ -75,3 +75,9 @@ class FaceDetector():
     
     def find_face_border(self,face):
         return self.face_top(face),self.face_left(face),self.face_bottom(face),self.face_right(face)
+    
+    def find_l_eye_border(self,face):
+        return face[159][1],face[130][0],face[145][1],face[133][0]
+    
+    def find_r_eye_border(self,face):
+        return face[386][1],face[463][0],face[374][1],face[263][0]
