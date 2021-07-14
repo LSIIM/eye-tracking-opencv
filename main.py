@@ -13,8 +13,10 @@ while True:
     if ret:
         #frame = cv.cvtColor(frame,cv.COLOR_BGR2RGB)
         img2,face = face_detector.findFaceMesh(frame)
-        if(len(face)>=1):
-            top,left,bottom,right = face_detector.find_face_border(face[0])
+        top,left,bottom,right = 0,0,0,0
+        if(len(face)>0):
+            face = face[0]
+            top,left,bottom,right = face_detector.find_face_border(face)
             cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),2)
         cv.imshow('Frame',frame)
 
