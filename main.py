@@ -7,26 +7,27 @@ import numpy as np
 from tqdm import tqdm
 import os
 
-def process_video(path,):
-    '''cameraID = 0
+def process_video(path = "",wc = False):
+    if wc:
+        cameraID = 0
 
-    # creates a camera obj - WEBCAM
-    camera = cv.VideoCapture(cameraID)
-'''
+        # creates a camera obj - WEBCAM
+        camera = cv.VideoCapture(cameraID)
+    else:
 
-    camera = cv.VideoCapture( str(path))
-    vfps = (camera.get(cv.CAP_PROP_FPS))
+        camera = cv.VideoCapture( str(path))
+        vfps = (camera.get(cv.CAP_PROP_FPS))
 
-    fourcc = cv.VideoWriter_fourcc(*'XVID')
+        fourcc = cv.VideoWriter_fourcc(*'XVID')
+
+        name = path.split('/')
+        name = name[len(name)-1].split('.')
+        name = name[0]
+        name =  './vds/prc/'+name + '.avi'
+        (h,w) = int(camera.get(cv.CAP_PROP_FRAME_WIDTH)),int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
+        out = cv.VideoWriter(name, fourcc,int(vfps),(h,w))
+    
     face_detector = FaceDetector(maxNumFaces=1,minDetectionConfidence=0.9)
-
-    name = path.split('/')
-    name = name[len(name)-1].split('.')
-    name = name[0]
-    name =  './vds/prc/'+name + '.avi'
-    (h,w) = int(camera.get(cv.CAP_PROP_FRAME_WIDTH)),int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
-    out = cv.VideoWriter(name, fourcc,int(vfps),(h,w))
-
     while True:
         ret, frame = camera.read()
         if ret: 
@@ -53,16 +54,18 @@ def process_video(path,):
                             for i in range(left,right):
                                 row.append(clear_image[j][i])
                             eye_image.append(row)
-                        #cv.imshow("L eye",np.array(eye_image))
+                        if wc:
+                            cv.imshow("L eye",np.array(eye_image))
                 except:
                     print("No left eye on image")
                 
                 if eye_image != []:
                     id = iris_detection(np.array(eye_image))
                     x,y,r = id.start_detection()
-                    if (x,y,r) != (0,0,0):
+                    if (x,y,r) != ([0],[0],[0]):
                         #print(x,y,r)
-                        cv.circle(frame, (x+left, y+top), r, (0, 255, 0), 2)
+                        for i in range(len(x)):
+                            cv.circle(frame, (x[i]+left, y[i]+top), r[i], (0, 255, 0), 2)
 
 
                 '''----------------------------------------------------------
@@ -77,29 +80,38 @@ def process_video(path,):
                             for i in range(left,right):
                                 row.append(clear_image[j][i])
                             eye_image.append(row)
-                        #cv.imshow("R eye",np.array(eye_image))
+                        if wc:
+                            cv.imshow("R eye",np.array(eye_image))
                 except:
                     print("No right eye on image")
                 if eye_image != []:
                     id = iris_detection(np.array(eye_image))
                     x,y,r = id.start_detection()
-                    if (x,y,r) != (0,0,0):
+                    if (x,y,r) != ([0],[0],[0]):
                         #print(x,y,r)
-                        cv.circle(frame, (x+left, y+top), r, (0, 255, 0), 2)
+                        for i in range(len(x)):
+                            cv.circle(frame, (x[i]+left, y[i]+top), r[i], (0, 255, 0), 2)
 
 
                 cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
-            #cv.imshow('Frame',frame)
-            out.write(frame)
-            '''key = cv.waitKey(1)
+            if wc:
+                cv.imshow('Frame',frame)
+                key = cv.waitKey(1)
 
-            if key == ord('q'):
-                break'''
+                if key == ord('q'):
+                    break
+            else:
+                out.write(frame)
+            
         else:
             break
     camera.release()
     cv.destroyAllWindows()
 
 if __name__ == "__main__":
-    for video in tqdm(os.listdir('./vds/raw')):
-        process_video("./vds/raw/"+video)
+    r_mode = input("1 - Video Batch processing\n2 - Webcam\nSelect: ")
+    if r_mode == "1":
+        for video in tqdm(os.listdir('./vds/raw')):
+            process_video(path = "./vds/raw/"+video)
+    else:
+        process_video(wc=True)

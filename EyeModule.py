@@ -35,13 +35,21 @@ class iris_detection():
 
         # docstring of HoughCircles: HoughCircles(image, method, dp, minDist[, circles[, param1[, param2[, minRadius[, maxRadius]]]]]) -> circles
         circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
-        x,y,r = 0,0,0
+        x,y,r = [0],[0],[0]
         if circles is not None:
             circles = np.uint16(np.around(circles))
             i = circles[0][0]
+            x,y,r = [i[0]], [i[1]], [i[2]]
+            if len(circles[0])>1:
+                #print(circles[0],len(circles[0]))
+                #print(circles[0][0])
+                if circles[0][1] != circles[0][0]:
+                    j = circles[0][1]
+                    x.append(j[0])
+                    y.append(j[1])
+                    r.append(j[2])
            #print(i[0])
             #print(i)
-            x,y,r = i[0], i[1], i[2]
         return x,y,r
     def start_detection(self):
 
