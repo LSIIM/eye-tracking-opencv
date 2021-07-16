@@ -19,7 +19,7 @@ with mp_face_detection.FaceDetection(
   while cap.isOpened():
     success, image = cap.read()
     if not success:
-        print("Ignoring empty camera frame.")
+       #print("Ignoring empty camera frame.")
         # If loading a video, use 'break' instead of 'continue'.
         continue
 
@@ -54,7 +54,7 @@ with mp_face_detection.FaceDetection(
         r_eye_m_aux = (0,0)
     cv2.putText(image,"+",(l_eye_m),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
     cv2.putText(image,"+",(r_eye_m),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
-    cv2.imshow('MediaPipe Face Detection', image)
+   #cv2.imshow('MediaPipe Face Detection', image)
     if cv2.waitKey(5) & 0xFF == 27:
         break
     aux+=1

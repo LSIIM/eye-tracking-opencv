@@ -19,14 +19,14 @@ class iris_detection():
         ret, o4 = cv2.threshold(gray,0,255, cv2.THRESH_TOZERO_INV + cv2.THRESH_OTSU )
         ret, o5 = cv2.threshold(gray,0,255, cv2.THRESH_TRUNC + cv2.THRESH_OTSU )
         
-        cv2.imshow("OTSU 1", o1)
-        cv2.imshow("OTSU 2", o2)
-        cv2.imshow("OTSU 3", o3)
-        cv2.imshow("OTSU 4", o4)
-        cv2.imshow("OTSU 5", o5)
+       #cv2.imshow("OTSU 1", o1)
+       #cv2.imshow("OTSU 2", o2)
+       #cv2.imshow("OTSU 3", o3)
+       #cv2.imshow("OTSU 4", o4)
+       #cv2.imshow("OTSU 5", o5)
         blurred = cv2.bilateralFilter(o5,10,50,50)
-        cv2.imshow("Blurred", blurred)
-        print(blurred.shape)
+       #cv2.imshow("Blurred", blurred)
+       #print(blurred.shape)
         minDist = 1
         param1 = 25 # 500
         param2 = 20 # 200 #smaller value-> more false circles
@@ -39,7 +39,7 @@ class iris_detection():
         if circles is not None:
             circles = np.uint16(np.around(circles))
             i = circles[0][0]
-            print(i[0])
+           #print(i[0])
             #print(i)
             x,y,r = i[0], i[1], i[2]
         return x,y,r
@@ -48,6 +48,6 @@ class iris_detection():
         if self._img is not None:
             return self.detect_iris()
         else:
-            print('Image could not be loaded.')
+           #print('Image could not be loaded.')
             return None,None,None
 
