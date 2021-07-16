@@ -13,13 +13,24 @@ class iris_detection():
         
         gray = cv2.cvtColor(self._img, cv2.COLOR_BGR2GRAY)
 
-        blurred = cv2.bilateralFilter(gray,10,50,50)
-        #cv2.imshow("Result b", blurred)
-        #print(blurred.shape)
+        ret, o1 = cv2.threshold(gray,0,255, cv2.THRESH_BINARY + cv2.THRESH_OTSU )
+        ret, o2 = cv2.threshold(gray,0,255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU )
+        ret, o3 = cv2.threshold(gray,0,255, cv2.THRESH_TOZERO + cv2.THRESH_OTSU )
+        ret, o4 = cv2.threshold(gray,0,255, cv2.THRESH_TOZERO_INV + cv2.THRESH_OTSU )
+        ret, o5 = cv2.threshold(gray,0,255, cv2.THRESH_TRUNC + cv2.THRESH_OTSU )
+        
+        cv2.imshow("OTSU 1", o1)
+        cv2.imshow("OTSU 2", o2)
+        cv2.imshow("OTSU 3", o3)
+        cv2.imshow("OTSU 4", o4)
+        cv2.imshow("OTSU 5", o5)
+        blurred = cv2.bilateralFilter(o5,10,50,50)
+        cv2.imshow("Blurred", blurred)
+        print(blurred.shape)
         minDist = 1
-        param1 = 35 # 500
-        param2 = 10 # 200 #smaller value-> more false circles
-        minRadius = 5
+        param1 = 25 # 500
+        param2 = 20 # 200 #smaller value-> more false circles
+        minRadius = 1
         maxRadius = 300 #10
 
         # docstring of HoughCircles: HoughCircles(image, method, dp, minDist[, circles[, param1[, param2[, minRadius[, maxRadius]]]]]) -> circles

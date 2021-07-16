@@ -27,7 +27,7 @@ while True:
                                 LEFT EYE PROCESSING
             ----------------------------------------------------------'''
             top,left,bottom,right = face_detector.find_l_eye_border(face)
-            #cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
+            cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
             eye_image = []
             try:
                 if top>=0 and left>=0 and bottom>=0 and right>=0:
@@ -71,7 +71,7 @@ while True:
                     cv.circle(frame, (x+left, y+top), r, (0, 255, 0), 2)
 
 
-            #cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
+            cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
         cv.imshow('Frame',frame)
 
         key = cv.waitKey(1)

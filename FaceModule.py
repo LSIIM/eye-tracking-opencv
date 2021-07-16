@@ -73,6 +73,7 @@ class FaceDetector():
                 highest = lm[0]
         return highest
     
+    #https://github.com/ManuelTS/augmentedFaceMeshIndices/blob/master/Left_Eye_shading.jpg
     def find_face_border(self,face):
         return self.face_top(face),self.face_left(face),self.face_bottom(face),self.face_right(face)
     
