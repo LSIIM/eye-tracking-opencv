@@ -43,7 +43,7 @@ class iris_detection():
             if len(circles[0])>1:
                 #print(circles[0],len(circles[0]))
                 #print(circles[0][0])
-                if circles[0][1] != circles[0][0]:
+                if circles[0][1].all is not circles[0][0]:
                     j = circles[0][1]
                     x.append(j[0])
                     y.append(j[1])
