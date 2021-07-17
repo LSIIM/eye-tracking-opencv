@@ -7,26 +7,32 @@ class iris_detection():
         '''
         self._img = image
         self._pupil = None
-    def convert_to_gray_scale(self):
-        self._img = cv2.cvtColor(self._img, cv2.COLOR_BGR2GRAY)        
-    def detect_iris(self):
-        
-        gray = cv2.cvtColor(self._img, cv2.COLOR_BGR2GRAY)
+    def convert_to_gray_scale(self,img):
+        return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)      
 
-        ret, o1 = cv2.threshold(gray,0,255, cv2.THRESH_BINARY + cv2.THRESH_OTSU )
-        ret, o2 = cv2.threshold(gray,0,255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU )
-        ret, o3 = cv2.threshold(gray,0,255, cv2.THRESH_TOZERO + cv2.THRESH_OTSU )
-        ret, o4 = cv2.threshold(gray,0,255, cv2.THRESH_TOZERO_INV + cv2.THRESH_OTSU )
-        ret, o5 = cv2.threshold(gray,0,255, cv2.THRESH_TRUNC + cv2.THRESH_OTSU )
+    def apply_otsus(self,img):
+        ret, o1 = cv2.threshold(img,0,255, cv2.THRESH_BINARY + cv2.THRESH_OTSU )
+        ret, o2 = cv2.threshold(img,0,255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU )
+        ret, o3 = cv2.threshold(img,0,255, cv2.THRESH_TOZERO + cv2.THRESH_OTSU )
+        ret, o4 = cv2.threshold(img,0,255, cv2.THRESH_TOZERO_INV + cv2.THRESH_OTSU )
+        ret, o5 = cv2.threshold(img,0,255, cv2.THRESH_TRUNC + cv2.THRESH_OTSU )
+        return [o1,o2,o3,o4,o5]
+    def detect_eye_features(self):
         
-       #cv2.imshow("OTSU 1", o1)
-       #cv2.imshow("OTSU 2", o2)
-       #cv2.imshow("OTSU 3", o3)
-       #cv2.imshow("OTSU 4", o4)
-       #cv2.imshow("OTSU 5", o5)
+        gray = self.convert_to_gray_scale(self._img)
+
+        
+        o1,o2,o3,o4,o5 = self.apply_otsus(gray)
+        #cv2.imshow("OTSU 1", o1)
+        #cv2.imshow("OTSU 2", o2)
+        #cv2.imshow("OTSU 3", o3)
+        #cv2.imshow("OTSU 4", o4)
+        #cv2.imshow("OTSU 5", o5)
         blurred = cv2.bilateralFilter(o5,10,50,50)
-       #cv2.imshow("Blurred", blurred)
-       #print(blurred.shape)
+        #cv2.imshow("Blurred", blurred)
+
+
+        #print(blurred.shape)
         minDist = 1
         param1 = 25 # 500
         param2 = 20 # 200 #smaller value-> more false circles
@@ -48,13 +54,75 @@ class iris_detection():
                     x.append(j[0])
                     y.append(j[1])
                     r.append(j[2])
-           #print(i[0])
+            #print(i[0])
             #print(i)
         return x,y,r
-    def start_detection(self):
+    
+    def detect_iris_hist(self):
+        gray = self.convert_to_gray_scale(self._img)
 
+        
+        o1,o2,o3,o4,o5 = self.apply_otsus(gray)
+        #cv2.imshow("OTSU 1", o1)
+        #cv2.imshow("OTSU 2", o2)
+        #cv2.imshow("OTSU 3", o3)
+        #cv2.imshow("OTSU 4", o4)
+        #cv2.imshow("OTSU 5", o5)
+        blurred = cv2.bilateralFilter(o5,10,50,50)
+        #cv2.imshow("Blurred", blurred)
+
+        col_count = np.zeros((blurred.shape[1]))
+        row_count = []
+        for i in range(blurred.shape[0]):
+            aux_row = 0
+            aux_col = 0
+            for j in range(blurred.shape[1]):
+                aux_row = aux_row + blurred[i][j]/blurred.shape[1]
+                col_count[j] = col_count[j] + blurred[i][j]/blurred.shape[0]
+            row_count.append(aux_row)
+        #cv2.imshow("Blurred", blurred)
+        for i in range(len(row_count)):
+            row_count[i] =( 255 -row_count[i])
+        for i in range(len(col_count)):
+            col_count[i] = (255 -col_count[i])
+        
+        row_count = np.array(row_count)
+        
+        row_count = row_count - row_count.min()
+        media_r = 0
+        for i,row in enumerate(row_count):
+            media_r+= row*i/row_count.sum()
+        desvio = 0
+        for i,row in enumerate(row_count):
+            if row>0:
+                desvio = media_r - i
+                break
+        col_count = col_count - col_count.min()
+        media_c = 0
+        for i,col in enumerate(col_count):
+            media_c+= col*i/col_count.sum()
+        '''print("x: ",media_c)
+        print("y: ",media_r)
+        print("raio: ",desvio)'''
+
+        #cv2.putText(self._img,'+',(int(media_c),int(media_r)),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
+        #cv2.circle(self._img, (int(media_c),int(media_r)), int(desvio), (0, 0, 255), 2)
+        if media_c is None or media_c == [] :
+            media_c = 0
+        if media_r is None or media_r == [] :
+            media_r = 0
+        if desvio is None or desvio == [] :
+            desvio = 0
+        #print([int(media_c)],[int(media_r)], [int(desvio)])
+        try:
+            return [int(media_c)],[int(media_r)], [int(desvio)]
+        except:
+            return [0],[0],[0]
+
+    def start_detection(self):
         if self._img is not None:
-            return self.detect_iris()
+            #return self.detect_eye_features()
+            return self.detect_iris_hist()
         else:
            #print('Image could not be loaded.')
             return None,None,None
