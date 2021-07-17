@@ -65,7 +65,7 @@ def process_video(path = "",wc = False):
                     if (x,y,r) != ([0],[0],[0]):
                         #print(x,y,r)
                         for i in range(len(x)):
-                            cv.circle(frame, (x[i]+left, y[i]+top), r[i], (0, 255, 0), 2)
+                            cv.ellipse(frame, (x[i]+left, y[i]+top), r[i],0,0,360, (0, 255, 0), 2)
 
 
                 '''----------------------------------------------------------
@@ -90,7 +90,7 @@ def process_video(path = "",wc = False):
                     if (x,y,r) != ([0],[0],[0]):
                         #print(x,y,r)
                         for i in range(len(x)):
-                            cv.circle(frame, (x[i]+left, y[i]+top), r[i], (0, 255, 0), 2)
+                            cv.ellipse(frame, (x[i]+left, y[i]+top), r[i],0,0,360, (0, 255, 0), 2)
 
 
                 cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)

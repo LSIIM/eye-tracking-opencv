@@ -41,11 +41,11 @@ class iris_detection():
 
         # docstring of HoughCircles: HoughCircles(image, method, dp, minDist[, circles[, param1[, param2[, minRadius[, maxRadius]]]]]) -> circles
         circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
-        x,y,r = [0],[0],[0]
+        x,y,r = [1],[1],[[1,1]]
         if circles is not None:
             circles = np.uint16(np.around(circles))
             i = circles[0][0]
-            x,y,r = [i[0]], [i[1]], [i[2]]
+            x,y,r = [i[0]], [i[1]], [[i[2],i[2]]]
             if len(circles[0])>1:
                 #print(circles[0],len(circles[0]))
                 #print(circles[0][0])
@@ -53,7 +53,7 @@ class iris_detection():
                     j = circles[0][1]
                     x.append(j[0])
                     y.append(j[1])
-                    r.append(j[2])
+                    r.append([j[2],j[2]])
             #print(i[0])
             #print(i)
         return x,y,r
@@ -92,32 +92,36 @@ class iris_detection():
         media_r = 0
         for i,row in enumerate(row_count):
             media_r+= row*i/row_count.sum()
-        desvio = 0
+        desvio_r = 0
         for i,row in enumerate(row_count):
+            #if row>(0.45*row_count.max()):
             if row>0:
-                desvio = media_r - i
+                desvio_r = media_r - i
                 break
+        
         col_count = col_count - col_count.min()
         media_c = 0
         for i,col in enumerate(col_count):
             media_c+= col*i/col_count.sum()
-        '''print("x: ",media_c)
-        print("y: ",media_r)
-        print("raio: ",desvio)'''
-
-        #cv2.putText(self._img,'+',(int(media_c),int(media_r)),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),1)
-        #cv2.circle(self._img, (int(media_c),int(media_r)), int(desvio), (0, 0, 255), 2)
+        desvio_c = 0
+        for i,col in enumerate(col_count):
+            if col>(0.45*col_count.max()):
+                desvio_c = media_c - i
+                break
         if media_c is None or media_c == [] :
             media_c = 0
         if media_r is None or media_r == [] :
             media_r = 0
-        if desvio is None or desvio == [] :
-            desvio = 0
-        #print([int(media_c)],[int(media_r)], [int(desvio)])
+        if desvio_r is None or desvio_r == [] or desvio_r<0 :
+            desvio_r = 0
+        if desvio_c is None or desvio_c == [] or desvio_c<0 :
+            desvio_c = 0
+
         try:
-            return [int(media_c)],[int(media_r)], [int(desvio)]
+            #print([int(media_c)],[int(media_r)], [[int(desvio_c),int(desvio_r)]])
+            return [int(media_c)],[int(media_r)], [[int(desvio_c),int(desvio_r)]]
         except:
-            return [0],[0],[0]
+            return [1],[1],[[1,1]]
 
     def start_detection(self):
         if self._img is not None:
