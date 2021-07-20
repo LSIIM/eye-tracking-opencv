@@ -1,10 +1,11 @@
 import cv2
 import numpy as np
 class iris_detection():
-    def __init__(self, image):
+    def __init__(self, image=None, data_save = None):
         '''
         initialize the class and set the class attributes
         '''
+        self._data = data_save
         self._img = image
         self._pupil = None
     def convert_to_gray_scale(self,img):
@@ -28,11 +29,11 @@ class iris_detection():
         #cv2.imshow("OTSU 3", o3)
         #cv2.imshow("OTSU 4", o4)
         #cv2.imshow("OTSU 5", o5)
-        blurred = cv2.bilateralFilter(o5,10,50,50)
-        #cv2.imshow("Blurred", blurred)
+        blured = cv2.bilateralFilter(o5,10,50,50)
+        #cv2.imshow("bin_img", bin_img)
 
 
-        #print(blurred.shape)
+        #print(bin_img.shape)
         minDist = 1
         param1 = 25 # 500
         param2 = 20 # 200 #smaller value-> more false circles
@@ -40,8 +41,8 @@ class iris_detection():
         maxRadius = 300 #10
 
         # docstring of HoughCircles: HoughCircles(image, method, dp, minDist[, circles[, param1[, param2[, minRadius[, maxRadius]]]]]) -> circles
-        circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
-        x,y,r = [1],[1],[[1,1]]
+        circles = cv2.HoughCircles(blured, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
+        x,y,r = [0],[0],[[0,0]]
         if circles is not None:
             circles = np.uint16(np.around(circles))
             i = circles[0][0]
@@ -69,18 +70,22 @@ class iris_detection():
         #cv2.imshow("OTSU 4", o4)
         #cv2.imshow("OTSU 5", o5)
         blurred = cv2.bilateralFilter(o5,10,50,50)
+        
+        #ret, bin_img = cv2.threshold(blurred,127,255,cv2.THRESH_BINARY)
+        ret, bin_img = cv2.threshold(blurred,int((blurred.mean() + blurred.max())/2),255,cv2.THRESH_BINARY)
         #cv2.imshow("Blurred", blurred)
+        #cv2.imshow("Binary", bin_img)
 
-        col_count = np.zeros((blurred.shape[1]))
+        col_count = np.zeros((bin_img.shape[1]))
         row_count = []
-        for i in range(blurred.shape[0]):
+        for i in range(bin_img.shape[0]):
             aux_row = 0
             aux_col = 0
-            for j in range(blurred.shape[1]):
-                aux_row = aux_row + blurred[i][j]/blurred.shape[1]
-                col_count[j] = col_count[j] + blurred[i][j]/blurred.shape[0]
+            for j in range(bin_img.shape[1]):
+                aux_row = aux_row + bin_img[i][j]/bin_img.shape[1]
+                col_count[j] = col_count[j] + bin_img[i][j]/bin_img.shape[0]
             row_count.append(aux_row)
-        #cv2.imshow("Blurred", blurred)
+        #cv2.imshow("bin_img", bin_img)
         for i in range(len(row_count)):
             row_count[i] =( 255 -row_count[i])
         for i in range(len(col_count)):
@@ -90,24 +95,28 @@ class iris_detection():
         
         row_count = row_count - row_count.min()
         media_r = 0
-        for i,row in enumerate(row_count):
-            media_r+= row*i/row_count.sum()
         desvio_r = 0
-        for i,row in enumerate(row_count):
-            #if row>(0.45*row_count.max()):
-            if row>0:
-                desvio_r = media_r - i
-                break
-        
-        col_count = col_count - col_count.min()
         media_c = 0
-        for i,col in enumerate(col_count):
-            media_c+= col*i/col_count.sum()
         desvio_c = 0
-        for i,col in enumerate(col_count):
-            if col>(0.45*col_count.max()):
-                desvio_c = media_c - i
-                break
+        if(len(row_count)>0):
+            for i,row in enumerate(row_count):
+                media_r+= row*i/row_count.sum()
+
+            for i,row in enumerate(row_count):
+                #if row>(0.45*row_count.max()):
+                if row>0:
+                    desvio_r = media_r - i
+                    break
+            
+            col_count = col_count - col_count.min()
+            for i,col in enumerate(col_count):
+                media_c+= col*i/col_count.sum()
+
+            for i,col in enumerate(col_count):
+                #if col>(0.45*col_count.max()):
+                if col>0:
+                    desvio_c = media_c - i
+                    break
         if media_c is None or media_c == [] :
             media_c = 0
         if media_r is None or media_r == [] :
@@ -116,12 +125,22 @@ class iris_detection():
             desvio_r = 0
         if desvio_c is None or desvio_c == [] or desvio_c<0 :
             desvio_c = 0
-
+        if self._data != None:
+            if type(self._data["left_eye"]["blurred"]) == np.ndarray:
+                self._data["right_eye"]["blurred"] = blurred
+                self._data["right_eye"]["binary"] = bin_img
+                self._data["right_eye"]["histograms"]["rows"] = row_count
+                self._data["right_eye"]["histograms"]["columns"] = col_count
+            else:
+                self._data["left_eye"]["blurred"] = blurred
+                self._data["left_eye"]["binary"] = bin_img
+                self._data["left_eye"]["histograms"]["rows"] = row_count
+                self._data["left_eye"]["histograms"]["columns"] = col_count
         try:
             #print([int(media_c)],[int(media_r)], [[int(desvio_c),int(desvio_r)]])
-            return [int(media_c)],[int(media_r)], [[int(desvio_c),int(desvio_r)]]
+            return [int(media_c)],[int(media_r)], [[int(desvio_c),int(desvio_r)]],self._data
         except:
-            return [1],[1],[[1,1]]
+            return [0],[0],[[0,0]],self._data
 
     def start_detection(self):
         if self._img is not None:
@@ -129,5 +148,5 @@ class iris_detection():
             return self.detect_iris_hist()
         else:
            #print('Image could not be loaded.')
-            return None,None,None
+            return None,None,None,self._data
 
