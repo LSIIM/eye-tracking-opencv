@@ -113,8 +113,8 @@ class iris_detection():
                 media_c+= col*i/col_count.sum()
 
             for i,col in enumerate(col_count):
-                #if col>(0.45*col_count.max()):
-                if col>0:
+                if col>(0.45*col_count.max()):
+                #if col>0:
                     desvio_c = media_c - i
                     break
         if media_c is None or media_c == [] :
