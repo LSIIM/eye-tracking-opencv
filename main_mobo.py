@@ -144,21 +144,39 @@ def process_video(path = ""):
                 past_positions['left'] = []
                 past_positions['right'] = []
 
-            for i,pos in enumerate(past_positions["right"]):
+
+
+            # Desenha as linhas do olho direito
+            for i in range(1,len(past_positions["right"])):
+                end_point=past_positions["right"][i]
+                start_point=past_positions["right"][i-1]
                 if i == len(past_positions["right"])-1:
                     color = (255,0,0)
                 else:
                     color = (0,0,255)
-                cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,3*i/len(past_positions["right"]),color,1)
-            for i,pos in enumerate(past_positions["left"]):
+                thickness= int(4*i/len(past_positions["right"]))+1
+                #print(thickness)
+                #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
+                frame = cv.line(frame, start_point, end_point, color, thickness)
+
+            # Desenha as linhas do olho esquerdo
+            for i in range(1,len(past_positions["left"])):
+                end_point=past_positions["left"][i]
+                start_point=past_positions["left"][i-1]
                 if i == len(past_positions["left"])-1:
                     color = (255,0,0)
                 else:
                     color = (0,0,255)
-                cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,3*i/len(past_positions["left"]),color,1)
+                thickness =int(4*i/len(past_positions["left"]))+1
+                #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
+                frame = cv  .line(frame, start_point, end_point, color, thickness)
+
+
 
             out.write(frame)
-            try:
+
+            # Saves the data collected in the modules
+            '''try:
                 file = open(path + "data.pickle", 'rb')
 
                 # dump information to that file
@@ -168,7 +186,9 @@ def process_video(path = ""):
             except:
                 save_data = {"data":[]}
             with open(path+ 'data.pickle', 'wb+') as handle:
-                pickle.dump(save_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                pickle.dump(save_data, handle, protocol=pickle.HIGHEST_PROTOCOL)'''
+
+
             '''print(data)
             print('\n\n\n\n')'''
             
