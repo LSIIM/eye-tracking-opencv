@@ -38,7 +38,8 @@ def image_resize(image, width = None, height = None, inter = cv.INTER_AREA):
     # return the resized image
     return resized
 
-# faz os traços depois do crop
+
+# faz os traços pela imagem original
 def process_video(path = ""):
     
     camera = cv.VideoCapture( str(path))
@@ -96,34 +97,19 @@ def process_video(path = ""):
             #frame = cv.cvtColor(frame,cv.COLOR_BGR2RGB)
             frame,face = face_detector.findFaceMesh(frame)
             top,left,bottom,right = 0,0,0,0
+            off_top,off_left,off_bottom,off_right = 0,0,frame.shape[0],frame.shape[1]
             if(len(face)>0):
                 face = face[0]
                 top,left,bottom,right = face_detector.find_face_border(face)
-                #cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),2)
-                face_centralized_image = []
-                if top<0:
-                    top = 0
-                if left<0:
-                    left = 0
-                
-                for j in range(top,bottom):
-                    row = []
-                    if(j>=clear_image.shape[0]):
-                        continue
-                    for i in range(left,right):
-                        if(i>=clear_image.shape[1]):
-                            continue
-                        row.append(clear_image[j][i])
-                    face_centralized_image.append(row)
-                face_centralized_image = np.array(face_centralized_image)
-                frame = face_centralized_image
                 
                 off_top,off_left,off_bottom,off_right = top,left,bottom,right
+                cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),2)
+
+
                 '''----------------------------------------------------------
                                     LEFT EYE PROCESSING
                 ----------------------------------------------------------'''
                 top,left,bottom,right = face_detector.find_l_eye_border(face)
-                top,left,bottom,right = top - off_top,left - off_left,bottom - off_top,right - off_left
                 cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
                 eye_image = []
                 try:
@@ -131,7 +117,7 @@ def process_video(path = ""):
                         for j in range(top,bottom):
                             row = []
                             for i in range(left,right):
-                                row.append(face_centralized_image[j][i])
+                                row.append(clear_image[j][i])
                             eye_image.append(row)
                         #print("here")
                         data['left_eye']['raw'] = np.array(eye_image)                        
@@ -159,16 +145,13 @@ def process_video(path = ""):
                                     Right EYE PROCESSING
                 ----------------------------------------------------------'''
                 top,left,bottom,right = face_detector.find_r_eye_border(face)
-                top,left,bottom,right = top - off_top,left - off_left,bottom - off_top,right - off_left
-                cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
-                
                 eye_image = []
                 try:
                     if top>=0 and left>=0 and bottom>=0 and right>=0:
                         for j in range(top,bottom):
                             row = []
                             for i in range(left,right):
-                                row.append(face_centralized_image[j][i])
+                                row.append(clear_image[j][i])
                             eye_image.append(row)
                         data['right_eye']['raw'] = np.array(eye_image)
                         
@@ -190,7 +173,7 @@ def process_video(path = ""):
                 else:
                     past_positions['right'] = []
 
-                
+                cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),1)
             else:
                 past_positions['left'] = []
                 past_positions['right'] = []
@@ -206,8 +189,6 @@ def process_video(path = ""):
                 else:
                     color = (0,0,255)
                 thickness= int(4*i/len(past_positions["right"]))+1
-                #print(thickness)
-                #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
                 frame = cv.line(frame, start_point, end_point, color, thickness)
 
             # Desenha as linhas do olho esquerdo
@@ -219,21 +200,31 @@ def process_video(path = ""):
                 else:
                     color = (0,0,255)
                 thickness =int(4*i/len(past_positions["left"]))+1
-                #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
                 frame = cv.line(frame, start_point, end_point, color, thickness)
 
+            face_centralized_image = []
+            if off_top<0:
+                off_top = 0
+            if off_left<0:
+                off_left = 0
+            if off_bottom>frame.shape[0]:
+                off_bottom = frame.shape[0]
+            if off_right>frame.shape[1]:
+                off_right = frame.shape[1]
             
-            
-            #print(frame[20][20][1])
-            #print([(0,clear_image.shape[0]-frame.shape[0]),(0,clear_image.shape[1]-frame.shape[1]),(0,0)])
+            #print('frame: ',frame.shape,frame.dtype)
+            face_centralized_image = frame[off_top:off_bottom,off_left:off_right]
+            #print('face: ',face_centralized_image.shape,face_centralized_image.dtype)
+            #print()
+            frame = face_centralized_image
+
             image = image_resize(frame, height = clear_image.shape[0])
-            '''cv.imshow("Resize",image)
-            cv.waitKey(1)'''
             if( (clear_image.shape[0]-image.shape[0] < 0 ) or (clear_image.shape[1]-image.shape[1] < 0) ):
                 print((0,clear_image.shape[0]-image.shape[0]),(0,clear_image.shape[1]-image.shape[1]))
                 image = image_resize(frame, width= clear_image.shape[1])
+            
+            
             frame = np.pad(image, [(0,clear_image.shape[0]-image.shape[0]),(0,clear_image.shape[1]-image.shape[1]),(0,0)],mode="constant")
-
             out.write(frame)
 
             
