@@ -5,9 +5,8 @@ import pickle
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-
 if __name__ == "__main__":
-    path = './vds/mob_points/'
+    path = './vds/processed/NIR/nir_points/'
     p_xy = input("Deseja mostrar somente os xy? S/N: ")
     for video_path in os.listdir(path):
         file = open(path + video_path+"/data.pickle", 'rb')
@@ -54,8 +53,8 @@ if __name__ == "__main__":
                     
                     # TESTAR CLOSENING
 
-                    '''cv.imshow("Binary Test Right Eye",bin_img)
-                    cv.imshow("AdapTh Right Eye",th2)
+                    cv.imshow("Binary Test Right Eye",bin_img)
+                    #cv.imshow("AdapTh Right Eye",th2)
                     plt.plot(right_row_count)
                     plt.title(label="right row")
                     plt.show()
@@ -68,7 +67,7 @@ if __name__ == "__main__":
                     plt.show()
                     plt.plot(left_col_count)
                     plt.title(label="left col")
-                    plt.show()'''
+                    plt.show()
                     key = cv.waitKey(10)
 
                     if key == ord('q'):

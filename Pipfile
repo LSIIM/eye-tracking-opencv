@@ -8,6 +8,7 @@ opencv-python = "*"
 numpy = "*"
 mediapipe = "*"
 tqdm = "*"
+scipy = "*"
 
 [dev-packages]
 
