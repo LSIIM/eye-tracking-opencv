@@ -21,6 +21,8 @@ class FaceDetector():
     
     def findFaceMesh(self,img, draw = False):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if(draw):
+            cv2.imshow("imgRGB",imgRGB)
         results = self.faceMesh.process(imgRGB)
         faces = []
         if results.multi_face_landmarks:

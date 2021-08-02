@@ -1,4 +1,5 @@
 #-*- coding:utf-8 -*-
+from itertools import count
 from FaceModule import FaceDetector
 from EyeModule import iris_detection
 
@@ -51,12 +52,12 @@ def process_video(path = ""):
     name = name[len(name)-1].split('.')
     name = name[0]
     try:
-        os.mkdir('./vds/nir/'+name )
+        os.mkdir('./vds/prc/'+name )
     except:
         print("Diretorio ja existe")
-    path = './vds/nir/'+name +"/"
-    name =  './vds/nir/'+name + '/video.avi'
-    
+    path = './vds/prc/'+name +"/"
+    name =  './vds/prc/'+name + '/video.avi'
+    vLength = int(camera.get(cv.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
     (h,w) = int(camera.get(cv.CAP_PROP_FRAME_WIDTH)),int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
     out = cv.VideoWriter(name, fourcc,int(vfps),(h,w))
@@ -66,7 +67,7 @@ def process_video(path = ""):
         "left": [],
         "right": []
     }
-    while True:
+    for i in tqdm(range (0,vLength+1)):
         data = {
             "left_eye": {
                 "raw": None,
@@ -94,6 +95,7 @@ def process_video(path = ""):
         ret, frame = camera.read()
         if ret: 
             clear_image = frame.copy()
+            #print("Ori: ",clear_image.shape)
             #frame = cv.cvtColor(frame,cv.COLOR_BGR2RGB)
             frame,face = face_detector.findFaceMesh(frame)
             rotated = frame
@@ -119,8 +121,6 @@ def process_video(path = ""):
                     face_centralized_image.append(row)
                 face_centralized_image = np.array(face_centralized_image)
                 frame = face_centralized_image
-                
-                off_top,off_left,off_bottom,off_right = top,left,bottom,right
                 topL,leftL,bottomL,rightL = face_detector.find_l_eye_border(face)
                
                 topR,leftR,bottomR,rightR = face_detector.find_r_eye_border(face)
@@ -128,10 +128,10 @@ def process_video(path = ""):
                 #print(math.atan((topR-topL)/(rightR-rightL))*180/3.14,(topR-topL),(rightR-rightL))
                 rotated = ndimage.rotate(clear_image, math.atan((topR-topL)/(rightR-rightL))*180/3.14)
 
-            clear_image = rotated
             frame,face = face_detector.findFaceMesh(rotated)
             top,left,bottom,right = 0,0,0,0
             if(len(face)>0):
+                clear_image = rotated
                 face = face[0]
                 top,left,bottom,right = face_detector.find_face_border(face)
                 #cv.rectangle(frame,(left,top),(right,bottom),(0,255,0),2)
@@ -267,8 +267,12 @@ def process_video(path = ""):
                 print((0,clear_image.shape[0]-image.shape[0]),(0,clear_image.shape[1]-image.shape[1]))
                 image = image_resize(frame, width= clear_image.shape[1])
             frame = np.pad(image, [(0,clear_image.shape[0]-image.shape[0]),(0,clear_image.shape[1]-image.shape[1]),(0,0)],mode="constant")
-
-            out.write(frame)
+            
+            resized =cv.resize(frame,(h,w))
+            '''cv.imshow("Resize",frame)
+            cv.waitKey(1)'''
+            #print("Fin: ",resized.shape)
+            out.write(resized)
 
             
         else:
@@ -280,3 +284,4 @@ def process_video(path = ""):
 if __name__ == "__main__":
     for video in tqdm(os.listdir('./vds/raw')):
             process_video(path = "./vds/raw/"+video)
+            os.system("cls")
