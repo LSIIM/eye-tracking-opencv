@@ -141,7 +141,47 @@ class iris_detection():
             return [int(media_c)],[int(media_r)], [[int(desvio_c),int(desvio_r)]],self._data
         except:
             return [0],[0],[[0,0]],self._data
-
+    def detect_pupil(self):
+        # Read image
+        
+        gray = self.convert_to_gray_scale(self._img)
+        
+        new_img = np.zeros(gray.shape, dtype=gray.dtype)
+        min_val = self._img.min() + 40
+        #print(new_img.shape)
+        print(min_val)
+        for i in range(0,new_img.shape[0]):
+            for j in range(0,new_img.shape[1]):
+                if(gray[i][j]>min_val):
+                    new_img[i][j] = 255 
+        new_img = np.array(new_img)
+        
+        cv2.imshow("d",new_img)
+        kernel = np.ones((5,5),np.uint8)
+        new_img = cv2.morphologyEx(new_img, cv2.MORPH_OPEN, kernel)
+        cv2.imshow("MORPH_OPEN",new_img)
+        new_img = cv2.morphologyEx(new_img, cv2.MORPH_CLOSE, kernel)
+        cv2.imshow("MORPH_CLOSE",new_img)
+        
+        contours,hierarchy = cv2.findContours(new_img, 1, 2)
+        for cnt in contours:
+            (x,y),radius = cv2.minEnclosingCircle(cnt)
+            center = [int(x),int(y)]
+            radius = int(radius)
+            cv2.circle(self._img,center,radius,(0,255,255),2)
+            cv2.imshow("dd",self._img)
+            cv2.waitKey(2)
+        if(len(contours) == 0):
+            return (0,0),0
+        
+        if len(contours)>1:
+            cnt = contours[1]
+        else:
+            cnt = contours[0]
+        (x,y),radius = cv2.minEnclosingCircle(cnt)
+        center = [int(x),int(y)]
+        radius = int(radius)
+        return center,radius
     def start_detection(self):
         if self._img is not None:
             #return self.detect_eye_features()
