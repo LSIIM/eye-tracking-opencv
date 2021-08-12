@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 class iris_detection():
     def __init__(self, image=None, data_save = None):
         '''
@@ -64,18 +65,34 @@ class iris_detection():
 
         
         o1,o2,o3,o4,o5 = self.apply_otsus(gray)
-        #cv2.imshow("OTSU 1", o1)
-        #cv2.imshow("OTSU 2", o2)
-        #cv2.imshow("OTSU 3", o3)
-        #cv2.imshow("OTSU 4", o4)
-        #cv2.imshow("OTSU 5", o5)
-        blurred = cv2.bilateralFilter(o5,10,50,50)
-        
+        blurred = cv2.bilateralFilter(o5,20,40,50)
+        o1,o2,o3,o4,o5 = self.apply_otsus(blurred)
+        cv2.imshow("OTSU 1", o1)
+        cv2.imshow("OTSU 2", o2)
+        cv2.imshow("OTSU 3", o3)
+        cv2.imshow("OTSU 4", o4)
+        cv2.imshow("OTSU 5", o5)
+        cv2.imshow("blur",blurred)
         #ret, bin_img = cv2.threshold(blurred,127,255,cv2.THRESH_BINARY)
-        ret, bin_img = cv2.threshold(blurred,int((blurred.mean() + blurred.max())/2),255,cv2.THRESH_BINARY)
-        #cv2.imshow("Blurred", blurred)
-        #cv2.imshow("Binary", bin_img)
+        ret, bin_img = cv2.threshold(blurred,int((2*blurred.mean())/2),255,cv2.THRESH_BINARY)
 
+
+        kernel = np.ones((5,5),np.uint8)
+        cv2.imshow("bin_iris",bin_img)
+        
+        '''bin_img = cv2.erode(bin_img,kernel,iterations = 3)
+        cv2.imshow("Erosion",bin_img)'''
+        bin_img = cv2.morphologyEx(bin_img, cv2.MORPH_OPEN, kernel)
+        cv2.imshow("MORPH_OPEN IRIS",bin_img)
+        bin_img = cv2.bilateralFilter(bin_img,50,100,50)
+        bin_img = cv2.bilateralFilter(bin_img,50,100,50)
+        bin_img = cv2.morphologyEx(bin_img, cv2.MORPH_CLOSE, kernel)
+        
+        ret, bin_img = cv2.threshold(bin_img,bin_img.min()+40,255,cv2.THRESH_BINARY)
+        cv2.imshow("MORPH_CLOSE IRIS",bin_img)
+        
+        
+        cv2.waitKey(1)
         col_count = np.zeros((bin_img.shape[1]))
         row_count = []
         for i in range(bin_img.shape[0]):
@@ -109,11 +126,12 @@ class iris_detection():
                     break
             
             col_count = col_count - col_count.min()
+            
             for i,col in enumerate(col_count):
                 media_c+= col*i/col_count.sum()
 
             for i,col in enumerate(col_count):
-                if col>(0.45*col_count.max()):
+                if col>(col_count.max()*0.25):
                 #if col>0:
                     desvio_c = media_c - i
                     break
@@ -145,23 +163,38 @@ class iris_detection():
         # Read image
         
         gray = self.convert_to_gray_scale(self._img)
+        o1,o2,o3,o4,o5 = self.apply_otsus(gray)
         
+        o5 = cv2.bilateralFilter(o5,30,50,50)
+        
+        '''cv2.imshow("OTSU 1", o1)
+        cv2.imshow("OTSU 2", o2)
+        cv2.imshow("OTSU 3", o3)
+        cv2.imshow("OTSU 4", o4)
+        cv2.imshow("OTSU 5", o5)'''
         new_img = np.zeros(gray.shape, dtype=gray.dtype)
-        min_val = self._img.min() + 40
+        min_val = o5.min()*1.2 + 30
         #print(new_img.shape)
         print(min_val)
         for i in range(0,new_img.shape[0]):
             for j in range(0,new_img.shape[1]):
-                if(gray[i][j]>min_val):
+                if(o5[i][j]>min_val):
                     new_img[i][j] = 255 
         new_img = np.array(new_img)
         
         cv2.imshow("d",new_img)
         kernel = np.ones((5,5),np.uint8)
+        
+        '''new_img = cv2.erode(new_img,kernel,iterations = 2)
+        cv2.imshow("Erosion Pup",new_img)'''
         new_img = cv2.morphologyEx(new_img, cv2.MORPH_OPEN, kernel)
         cv2.imshow("MORPH_OPEN",new_img)
         new_img = cv2.morphologyEx(new_img, cv2.MORPH_CLOSE, kernel)
         cv2.imshow("MORPH_CLOSE",new_img)
+        
+        new_img = cv2.erode(new_img,kernel,iterations = 1)
+        cv2.imshow("EROSION",new_img)
+        
         
         contours,hierarchy = cv2.findContours(new_img, 1, 2)
         for cnt in contours:
