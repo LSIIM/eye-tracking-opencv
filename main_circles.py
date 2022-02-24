@@ -51,11 +51,11 @@ def process_video(path = ""):
     name = name[len(name)-1].split('.')
     name = name[0]
     try:
-        os.mkdir('./vds/prc/'+name )
+        os.mkdir('./vds/prc/'+name + "-circles" )
     except:
         print("Diretorio ja existe")
-    path = './vds/prc/'+name +"/"
-    name =  './vds/prc/'+name + '/video.avi'
+    path = './vds/prc/'+name +"-circles/"
+    name =  './vds/prc/'+name + '-circles/video.avi'
     
     #file = open(path+"data.pickle", 'rb')
     (h,w) = int(camera.get(cv.CAP_PROP_FRAME_WIDTH)),int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -132,9 +132,10 @@ def process_video(path = ""):
                         past_positions["left"].append([x[0]+left,y[0]+top])
                         data['left_eye']['x'] = x[0]+left
                         data['left_eye']['y'] = y[0]+top
-                        cv.circle(frame, (x[0]+left, y[0]+top), r[0][0], (0, 255, 0), 2)
+                        iradius = int((r[0][0] + r[0][1])/2)
+                        cv.circle(frame, (x[0]+left, y[0]+top), iradius, (0, 255, 0), 2)
                         center,radius = id.detect_pupil()
-                        if (radius<r[0][0]):
+                        if (radius<iradius):
                             center = center[0]+left,center[1]+top
                             cv.circle(frame,center,radius,(0,255,255),2)
                     else:
@@ -166,9 +167,10 @@ def process_video(path = ""):
                         past_positions["right"].append([x[0]+left,y[0]+top])
                         data['right_eye']['x'] = x[0]+left
                         data['right_eye']['y'] = y[0]+top
-                        cv.circle(frame, (x[0]+left, y[0]+top), r[0][0], (0, 255, 0), 2)
+                        iradius = int((r[0][0] + r[0][1])/2)
+                        cv.circle(frame, (x[0]+left, y[0]+top), iradius, (0, 255, 0), 2)
                         center,radius = id.detect_pupil()
-                        if (radius<r[0][0]):
+                        if (radius<iradius):
                             center = center[0]+left,center[1]+top
                             cv.circle(frame,center,radius,(0,255,255),2)
                     else:
