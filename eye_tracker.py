@@ -58,7 +58,7 @@ def process_video(path = ""):
     except:
         print("Diretorio ja existe")
     path = prc_path+ '/' + name + "/"
-    name =  prc_path+name + '/video.avi'
+    name =  prc_path+"/"+name + '/video.avi'
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
     (h,w) = int(camera.get(cv2.CAP_PROP_FRAME_WIDTH)),int(camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -106,7 +106,7 @@ def process_video(path = ""):
                 err = type(exception).__name__
                 print()
                 print(err)
-                break
+                continue
 
             eye_module = EyeModule(image=fimage,data_save=data,lms=lms)
             left_iris, right_iris = eye_module.detect_iris()
@@ -117,5 +117,5 @@ def process_video(path = ""):
             cv2.waitKey(1)
             
 if __name__=="__main__":
-    process_video(path = raw_path+"/rodrigo.mp4")
+    process_video(path = raw_path+"/bebe.mp4")
     
