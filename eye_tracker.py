@@ -8,6 +8,7 @@ import pandas as pd
 
 from face_adjustments_module import FaceAdjuster
 from face_mesh_module import FaceMeshDetector
+from eye_feature_detector_module import EyeModule
 from definitions import *
 
 def analyseFace(image, extractor):
@@ -16,10 +17,11 @@ def analyseFace(image, extractor):
     rt = img_new_width/col
     image = cv2.resize(image, (img_new_width, int(row*rt)))
     lms = extractor.findFaceMesh(image.copy())
-    if(not lms):
+    
+    if(lms is None):
         print("/nNo faces")
         return [], "No Faces detected"
-    lms = lms[0]
+    
     # --------------------------------------------------------------------------
     adjuster = FaceAdjuster(image.copy(), lms)
     _, succeed = adjuster.alignEyes()
@@ -106,28 +108,11 @@ def process_video(path = ""):
                 print(err)
                 break
 
-            # Left eye indices list
-            LEFT_EYE =[ 362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385,384, 398 ]
-            # Right eye indices list
-            RIGHT_EYE=[ 33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161 , 246 ]
-            LEFT_IRIS = [474,475, 476, 477]
-            left_iris_points_pos = []
-            right_iris_points_pos = []
-            for lm in LEFT_IRIS:
-                left_iris_points_pos.append(lms[lm])
-            for lm in RIGHT_IRIS:
-                right_iris_points_pos.append(lms[lm])
+            eye_module = EyeModule(image=fimage,data_save=data,lms=lms)
+            left_iris, right_iris = eye_module.detect_iris()
             
-
-            (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(np.array(right_iris_points_pos))
-            center_right = np.array([r_cx, r_cy], dtype=np.int32)
-            cv2.circle(fimage, center_right, int(r_radius), (255,0,255), 1, cv2.LINE_AA)
-            
-
-            (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(np.array(left_iris_points_pos))
-            center_left = np.array([l_cx, l_cy], dtype=np.int32)
-            cv2.circle(fimage, center_left, int(l_radius), (255,0,255), 1, cv2.LINE_AA)
-            
+            cv2.circle(fimage, left_iris[0],left_iris[1], (255,0,255), 1, cv2.LINE_AA)
+            cv2.circle(fimage, right_iris[0],right_iris[1], (255,0,255), 1, cv2.LINE_AA)
             cv2.imshow("adjusted",fimage)
             cv2.waitKey(1)
             

@@ -42,6 +42,6 @@ class FaceMeshDetector():
                     face.append((x, y))
                 lms.append(face)
 
-            return lms
+            return np.array(lms[0])
         else:
             return None
