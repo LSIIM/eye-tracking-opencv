@@ -108,9 +108,15 @@ def process_video(path = ""):
                 print(err)
                 continue
 
+
+            # Identifies where the iris is and get its radius
             eye_module = EyeModule(image=fimage,data_save=data,lms=lms)
             left_iris, right_iris = eye_module.detect_iris()
             
+
+            eye_module.detect_pupil()
+
+
             cv2.circle(fimage, left_iris[0],left_iris[1], (255,0,255), 1, cv2.LINE_AA)
             cv2.circle(fimage, right_iris[0],right_iris[1], (255,0,255), 1, cv2.LINE_AA)
             cv2.imshow("adjusted",fimage)
