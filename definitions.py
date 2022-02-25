@@ -8,8 +8,8 @@ face_height = 500
 face_margin = 25
 
 
-prc_path = "E:/Projetos/UFSC/Eye Tracker/eye-tracking-opencv/vds/prc"
-raw_path = "E:/Projetos/UFSC/Eye Tracker/eye-tracking-opencv/vds/raw"
+prc_path = "./vds/prc"
+raw_path = "./vds/raw"
 
 LEFT_EYE =[ 362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385,384, 398 ]
 # right eyes indices
