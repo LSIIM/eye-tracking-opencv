@@ -93,15 +93,15 @@ def process_video(path = ""):
     name = name[len(name)-1].split('.')
     name = name[0]
     try:
-        os.mkdir(prc_path+name )
+        os.mkdir(prc_path+"/"+name )
     except:
         print("Diretorio ja existe")
     path = prc_path+ '/' + name + "/"
     name =  prc_path+"/"+name + '/video.avi'
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
-    (h,w) = int(camera.get(cv2.CAP_PROP_FRAME_WIDTH)),int(camera.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    #out = cv2.VideoWriter(name, fourcc,int(vfps),(h,w))
+    
+    out = cv2.VideoWriter(name, fourcc,int(vfps),(final_image_size_height,final_image_size_width))
     
     positions_data = PositionsModule()
     landmarks_extractor = FaceMeshDetector()
@@ -142,7 +142,11 @@ def process_video(path = ""):
 
 
             positions_data.add_positions(frame_data)
+            out.write(fimage)
+    camera.release()
+    cv.destroyAllWindows()
             
 if __name__=="__main__":
-    process_video(path = raw_path+"/bebe.mp4")
+    for video in tqdm(os.listdir('./vds/raw')):
+            process_video(path = "./vds/raw/"+video)
     
