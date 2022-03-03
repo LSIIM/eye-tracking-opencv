@@ -43,6 +43,8 @@ class EyeModule():
         (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(np.array(left_iris_points_pos))
         center_left = np.array([l_cx, l_cy], dtype=np.int32)
         return [[center_left, int(l_radius)],[center_right,int(r_radius)]]
+
+
         
 
     def crop_left_eye(self, img):
@@ -99,8 +101,8 @@ class EyeModule():
         ret, bin_img = cv2.threshold(bin_img,bin_img.min()+40,255,cv2.THRESH_BINARY)
         cv2.imshow("MORPH_CLOSE",bin_img)
         
-        
-       
+                # centro, raio
+        return (100,100),20
        
 
 
