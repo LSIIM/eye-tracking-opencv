@@ -75,7 +75,7 @@ class FaceAdjuster():
 
     def faceCrop(self):
         rows, cols = self._img.shape[:2]
-        top, left, bottom, right = self._find_face_border()
+        top, left, bottom, right = self.find_face_border()
         cent_img = []
         #print(top, left, bottom, right)
         if top < 0:
@@ -210,7 +210,7 @@ class FaceAdjuster():
         return highest
 
     # https://github.com/ManuelTS/augmentedFaceMeshIndices/blob/master/Left_Eye_shading.jpg
-    def _find_face_border(self):
+    def find_face_border(self):
         margin = face_margin
         top = self._face_top()-margin
         bottom = self._face_bottom()+margin
