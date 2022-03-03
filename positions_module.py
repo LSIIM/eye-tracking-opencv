@@ -23,31 +23,39 @@ class PositionsModule():
         df = pd.DataFrame()
         left_iris_x = []
         left_iris_y = []
+        left_iris_r = []
 
         right_iris_x = []
         right_iris_y = []
+        right_iris_r = []
 
 
         left_pupil_x = []
         left_pupil_y = []
+        left_pupil_r = []
 
         right_pupil_x = []
         right_pupil_y = []
+        right_pupil_r = []
 
         frame = []
         for i in range(len(self._data)):
             left_iris_x.append(self._data[i]._left_iris['x'] if self._data[i]._left_iris else "")
             left_iris_y.append(self._data[i]._left_iris['y'] if self._data[i]._left_iris else "")
+            left_iris_r.append(self._data[i]._left_iris['r'] if self._data[i]._left_iris else "")
 
             right_iris_x.append(self._data[i]._right_iris['x'] if self._data[i]._right_iris else "")
             right_iris_y.append(self._data[i]._right_iris['y'] if self._data[i]._right_iris else "")
+            right_iris_r.append(self._data[i]._right_iris['r'] if self._data[i]._right_iris else "")
 
 
             left_pupil_x.append(self._data[i]._left_pupil['x'] if self._data[i]._left_pupil else "")
             left_pupil_y.append(self._data[i]._left_pupil['y'] if self._data[i]._left_pupil else "")
+            left_pupil_r.append(self._data[i]._left_pupil['r'] if self._data[i]._left_pupil else "")
 
             right_pupil_x.append(self._data[i]._right_pupil['y'] if self._data[i]._right_pupil else "")
             right_pupil_y.append(self._data[i]._right_pupil['y'] if self._data[i]._right_pupil else "")
+            right_pupil_r.append(self._data[i]._right_pupil['r'] if self._data[i]._right_pupil else "")
 
             frame.append(self._data[i]._frame if self._data[i]._frame != None else "")
         
