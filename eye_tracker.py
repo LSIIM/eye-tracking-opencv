@@ -28,19 +28,19 @@ def adjustFace(image, extractor):
     adjuster = FaceAdjuster(image.copy(), lms)
     _, succeed = adjuster.alignEyes()
     if not succeed:
-        return [], adjuster.error
+        return [],[], adjuster.error
     _, succeed = adjuster.alignFace()
     if not succeed:
-        return [], adjuster.error
+        return [],[], adjuster.error
     _, succeed = adjuster.faceCrop()
     if not succeed:
-        return [], adjuster.error
+        return [],[], adjuster.error
     _, succeed = adjuster.alignFace()
     if not succeed:
-        return [], adjuster.error
-    finalImage, succeed = adjuster.fixImageSizeWitBorders()
+        return [],[], adjuster.error
+    finalImage, succeed = adjuster.fixImageSizeWithBorders()
     if not succeed:
-        return [], adjuster.error
+        return [],[], adjuster.error
 
     nlms = adjuster.getLms()
 
@@ -61,8 +61,6 @@ def draw_iris_circles(image,left_iris,right_iris):
 def draw_past_positions_iris_center(image,positions_data,max_number_draw):
     left_eye,right_eye = positions_data.get_past_n_positions(max_number_draw)
 
-    
-
     for i in range(1,len(left_eye)):
         end_point=left_eye[i]
         start_point=left_eye[i-1]
@@ -71,7 +69,6 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
         else:
             color = (0,0,255)
         thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
-        #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
         image = cv2.line(image, start_point, end_point, color, thickness)
 
     for i in range(1,len(right_eye)):
@@ -82,7 +79,6 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
         else:
             color = (0,0,255)
         thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
-        #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
         image = cv2.line(image, start_point, end_point, color, thickness)
     return image
 
@@ -104,7 +100,7 @@ def process_video(path = ""):
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
     
-    out = cv2.VideoWriter(name, fourcc,int(vfps),(final_image_size_height,final_image_size_width))
+    out = cv2.VideoWriter(name, fourcc,vfps,(final_image_size_width,final_image_size_height))
     
     positions_data = PositionsModule()
     landmarks_extractor = FaceMeshDetector()
@@ -145,11 +141,11 @@ def process_video(path = ""):
             cv2.imshow("adjusted",fimage)
             cv2.waitKey(1)
 
-
+            #print("\nfimage shape ",fimage.shape)
 
             out.write(fimage)
     camera.release()
-    cv.destroyAllWindows()
+    cv2.destroyAllWindows()
             
 if __name__=="__main__":
     for video in tqdm(os.listdir('./vds/raw')):
