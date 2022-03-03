@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 from numpy.core.numeric import NaN
 from definitions import *
 class EyeModule():
-    def __init__(self, image=None, data_save = None, lms=None):
+    def __init__(self, image=None,  lms=None):
         '''
         initialize the class and set the class attributes
         '''
-        self._data = data_save
         self._img = image
         self._pupil = None
         self._lms = lms

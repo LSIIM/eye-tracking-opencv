@@ -75,7 +75,7 @@ class FaceAdjuster():
 
     def faceCrop(self):
         rows, cols = self._img.shape[:2]
-        top, left, bottom, right = self._find_face_border()
+        top, left, bottom, right = self.find_face_border()
         cent_img = []
         #print(top, left, bottom, right)
         if top < 0:
@@ -112,22 +112,26 @@ class FaceAdjuster():
         return cent_img, True
     # private mathods
 
-    def fixImageSizeWitBorders(self):
+    def fixImageSizeWithBorders(self):
         height = final_image_size_height
         width = final_image_size_width
         row, col = self._img.shape[:2]
-        #print("dfghj ", (row, col))
         hdif = height-row
         cdif = width-col
-        # print(self._img[12][12])
-
+        left_cdif = int(cdif/2)
+        right_cdif = int(cdif/2)
+        if(2*int(cdif/2)+col>final_image_size_width):
+            left_cdif-=1
+        if(2*int(cdif/2)+col<final_image_size_width):
+            left_cdif+=1
+            
         try:
             border = cv2.copyMakeBorder(
                 self._img,
                 top=0,
-                bottom=int(hdif/2),
-                left=int(cdif/2),
-                right=int(cdif/2),
+                bottom=int(hdif),
+                left=left_cdif,
+                right=right_cdif,
                 borderType=cv2.BORDER_CONSTANT,
                 value=[0, 0, 0]
             )
@@ -210,7 +214,7 @@ class FaceAdjuster():
         return highest
 
     # https://github.com/ManuelTS/augmentedFaceMeshIndices/blob/master/Left_Eye_shading.jpg
-    def _find_face_border(self):
+    def find_face_border(self):
         margin = face_margin
         top = self._face_top()-margin
         bottom = self._face_bottom()+margin
