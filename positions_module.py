@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import pandas as pd
 from definitions import *
 class PositionsModule():
     def __init__(self):
@@ -19,15 +20,63 @@ class PositionsModule():
             right_eye.append([eyeData._right_iris["x"],eyeData._right_iris['y']])
         return left_eye,right_eye
     def save_data(self,path):
-        return True
+        df = pd.DataFrame()
+        left_iris_x = []
+        left_iris_y = []
+
+        right_iris_x = []
+        right_iris_y = []
+
+
+        left_pupil_x = []
+        left_pupil_y = []
+
+        right_pupil_x = []
+        right_pupil_y = []
+
+        frame = []
+        for i in range(len(self._data)):
+            left_iris_x.append(self._data[i]._left_iris['x'] if self._data[i]._left_iris else "")
+            left_iris_y.append(self._data[i]._left_iris['y'] if self._data[i]._left_iris else "")
+
+            right_iris_x.append(self._data[i]._right_iris['x'] if self._data[i]._right_iris else "")
+            right_iris_y.append(self._data[i]._right_iris['y'] if self._data[i]._right_iris else "")
+
+
+            left_pupil_x.append(self._data[i]._left_pupil['x'] if self._data[i]._left_pupil else "")
+            left_pupil_y.append(self._data[i]._left_pupil['y'] if self._data[i]._left_pupil else "")
+
+            right_pupil_x.append(self._data[i]._right_pupil['y'] if self._data[i]._right_pupil else "")
+            right_pupil_y.append(self._data[i]._right_pupil['y'] if self._data[i]._right_pupil else "")
+
+            frame.append(self._data[i]._frame if self._data[i]._frame != None else "")
+        
+
+        df["frame"] = frame 
+
+
+        df["left_iris_x"] = left_iris_x 
+        df["left_iris_y"] = left_iris_y 
+
+        df["right_iris_x"] = right_iris_x 
+        df["right_iris_y"] = right_iris_y 
+
+
+        df["left_pupil_x"] = left_pupil_x 
+        df["left_pupil_y"] = left_pupil_y 
+
+        df["right_pupil_x"] = right_pupil_x 
+        df["right_pupil_y"] = right_pupil_y 
+
+        df.to_csv(path)
 
 
 class EyeDataModule():
     def __init__(self,frame):
-        self._left_iris = {}
-        self._right_iris = {}
-        self._left_pupil = {}
-        self._right_pupil = {}
+        self._left_iris = None
+        self._right_iris = None
+        self._left_pupil = None
+        self._right_pupil = None
         self._frame = frame
 
     def add_left_iris(self, left_iris):

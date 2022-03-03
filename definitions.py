@@ -4,7 +4,7 @@ final_image_size_width = 1240
 initial_image_width = 1240
 
 p10_height = 25
-face_height = 500
+face_height = 600
 face_margin = 25
 
 

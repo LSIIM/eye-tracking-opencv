@@ -142,11 +142,11 @@ def process_video(path = ""):
             cv2.waitKey(1)
 
             #print("\nfimage shape ",fimage.shape)
-
+            
             out.write(fimage)
     camera.release()
     cv2.destroyAllWindows()
-            
+    positions_data.save_data(path+"/positions.csv")
 if __name__=="__main__":
     for video in tqdm(os.listdir('./vds/raw')):
             process_video(path = "./vds/raw/"+video)
