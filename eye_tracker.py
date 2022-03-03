@@ -120,7 +120,7 @@ def process_video(path = ""):
                 continue
 
 
-            # Identifies where the iris is and get its radius
+            # Identifica a iris e pega o raio
             eye_module = EyeModule(image=fimage,lms=lms)
             left_iris, right_iris = eye_module.detect_iris()
             
