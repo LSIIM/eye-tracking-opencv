@@ -136,8 +136,8 @@ def process_video(path = ""):
             fimage = draw_past_positions_iris_center(fimage,positions_data,20)
 
             
-            #cv2.imshow("adjusted",fimage)
-            #cv2.waitKey(1)
+            cv2.imshow("adjusted",fimage)
+            cv2.waitKey(1)
 
 
 

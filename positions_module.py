@@ -11,7 +11,8 @@ class PositionsModule():
     def get_past_n_positions(self,n):
         left_eye = []
         right_eye = []
-        for i,eyeData in enumerate(self._data):
+        for i in range(len(self._data)):
+            eyeData = self._data[len(self._data)-1]
             if(i>n):
                 break
             left_eye.append([eyeData._left_iris["x"],eyeData._left_iris['y']])
