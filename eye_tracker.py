@@ -60,25 +60,28 @@ def draw_iris_circles(image,left_iris,right_iris):
 
 def draw_past_positions_iris_center(image,positions_data,max_number_draw):
     left_eye,right_eye = positions_data.get_past_n_positions(max_number_draw)
+
+    
+
     for i in range(1,len(left_eye)):
         end_point=left_eye[i]
         start_point=left_eye[i-1]
-        if i == len(left_eye)-1:
+        if i == 1:
             color = (255,0,0)
         else:
             color = (0,0,255)
-        thickness =int(4*i/len(left_eye))+1
+        thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
         #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
         image = cv2.line(image, start_point, end_point, color, thickness)
 
     for i in range(1,len(right_eye)):
         end_point=right_eye[i]
         start_point=right_eye[i-1]
-        if i == len(right_eye)-1:
+        if i ==1:
             color = (255,0,0)
         else:
             color = (0,0,255)
-        thickness =int(4*i/len(right_eye))+1
+        thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
         #cv.putText(frame,'.',(pos),cv.FONT_HERSHEY_PLAIN,thickness,color,1)
         image = cv2.line(image, start_point, end_point, color, thickness)
     return image
@@ -130,6 +133,9 @@ def process_video(path = ""):
             frame_data.add_right_iris(right_iris)
 
 
+            #salva os dados totais
+            positions_data.add_positions(frame_data)
+
             # desenha as coisas no rosto
             fimage = draw_face_box(fimage,face_border)
             fimage = draw_iris_circles(fimage,left_iris,right_iris)
@@ -141,7 +147,6 @@ def process_video(path = ""):
 
 
 
-            positions_data.add_positions(frame_data)
             out.write(fimage)
     camera.release()
     cv.destroyAllWindows()

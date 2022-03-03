@@ -12,7 +12,7 @@ class PositionsModule():
         left_eye = []
         right_eye = []
         for i in range(len(self._data)):
-            eyeData = self._data[len(self._data)-1]
+            eyeData = self._data[len(self._data)-(1+i)]
             if(i>n):
                 break
             left_eye.append([eyeData._left_iris["x"],eyeData._left_iris['y']])
