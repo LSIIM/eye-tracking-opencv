@@ -31,17 +31,10 @@ class FaceMeshDetector():
     def findFaceMesh(self, image):
         imgRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = self._faceMesh.process(imgRGB)
-        lms = []
-        # tenho que mudar isso pra np array
+        img_h, img_w = image.shape[:2]
         if results.multi_face_landmarks:
-            for faceLms in results.multi_face_landmarks:
-                face = []
-                for lm in faceLms.landmark:
-                    ih, iw, ic = image.shape
-                    x, y = int(lm.x*iw), int(lm.y*ih)
-                    face.append((x, y))
-                lms.append(face)
-
-            return np.array(lms[0])
+            mesh_points=np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
+            
+            return mesh_points
         else:
             return None
