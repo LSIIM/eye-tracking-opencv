@@ -32,7 +32,7 @@ class FaceMeshDetector():
         imgRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = self._faceMesh.process(imgRGB)
         lms = []
-        
+        # tenho que mudar isso pra np array
         if results.multi_face_landmarks:
             for faceLms in results.multi_face_landmarks:
                 face = []

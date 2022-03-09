@@ -82,6 +82,11 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
         image = cv2.line(image, start_point, end_point, color, thickness)
     return image
 
+def draw_face_mesh_points(image, lms,color = (0,0,255)):
+    for lm in lms:
+        image = cv2.circle(image, (lm), radius=1, color=color, thickness=-1)
+    return image
+
 def process_video(path = ""):
     camera = cv2.VideoCapture( str(path))
     vfps = (camera.get(cv2.CAP_PROP_FPS))
@@ -132,11 +137,11 @@ def process_video(path = ""):
             #salva os dados totais
             positions_data.add_positions(frame_data)
 
-            # desenha as coisas no rosto
+            # desenha as coisas no rosto, descomenta o que não quiser mostrar
             fimage = draw_face_box(fimage,face_border)
             fimage = draw_iris_circles(fimage,left_iris,right_iris)
             fimage = draw_past_positions_iris_center(fimage,positions_data,20)
-
+            fimage = draw_face_mesh_points(image=fimage,lms=lms)
             
             cv2.imshow("adjusted",fimage)
             cv2.waitKey(1)
