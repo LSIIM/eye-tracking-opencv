@@ -1,4 +1,4 @@
-final_image_size_height = 720
+final_image_size_height = 850
 final_image_size_width = 1240
 
 initial_image_width = 1240

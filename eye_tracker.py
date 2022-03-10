@@ -21,7 +21,7 @@ def adjustFace(image, extractor):
     lms = extractor.findFaceMesh(image.copy())
     
     if(lms is None):
-        print("/nNo faces")
+        print("\nNo faces")
         return [], "No Faces detected"
     
     # --------------------------------------------------------------------------
