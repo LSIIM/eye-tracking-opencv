@@ -128,6 +128,10 @@ def process_video(path = ""):
             # Identifica a iris e pega o raio
             eye_module = EyeModule(image=fimage,lms=lms)
             left_iris, right_iris = eye_module.detect_iris()
+
+
+            left_pupil, right_pupil = eye_module.detect_pupil()
+
             
             #salva as posições
             frame_data.add_left_iris(left_iris)
@@ -143,7 +147,7 @@ def process_video(path = ""):
             fimage = draw_past_positions_iris_center(fimage,positions_data,20)
             fimage = draw_face_mesh_points(image=fimage,lms=lms)
             
-            cv2.imshow("adjusted",fimage)
+            #cv2.imshow("adjusted",fimage)
             cv2.waitKey(1)
 
             #print("\nfimage shape ",fimage.shape)
