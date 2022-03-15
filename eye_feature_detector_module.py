@@ -49,11 +49,11 @@ class EyeModule():
 
     def crop_left_eye(self, img):
         return img[
-            self._lms[RIGHT_IRIS[1]][1]:self._lms[RIGHT_IRIS[3]][1],
-            self._lms[RIGHT_IRIS[2]][0]:self._lms[RIGHT_IRIS[0]][0]]
+            self._lms[LEFT_IRIS[1]][1]:self._lms[LEFT_IRIS[3]][1],
+            self._lms[LEFT_IRIS[2]][0]:self._lms[LEFT_IRIS[0]][0]]
         
     def crop_right_eye(self, img):
-        return img[self._lms[LEFT_IRIS[1]][1]:self._lms[LEFT_IRIS[3]][1],self._lms[LEFT_IRIS[2]][0]:self._lms[LEFT_IRIS[0]][0]]
+        return img[self._lms[RIGHT_IRIS[1]][1]:self._lms[RIGHT_IRIS[3]][1],self._lms[RIGHT_IRIS[2]][0]:self._lms[RIGHT_IRIS[0]][0]]
 
     def apply_otsus(self,img):
         ret, o1 = cv2.threshold(img,0,255, cv2.THRESH_BINARY + cv2.THRESH_OTSU )
@@ -73,25 +73,14 @@ class EyeModule():
                 col_count[j] = col_count[j] + img[i][j]/img.shape[0]
             row_count.append(aux_row)
         #cv2.imshow("img", img)
-        
-        
-        row_count = np.array(row_count)
         for i in range(len(row_count)):
             row_count[i] =( 255 -row_count[i])
         for i in range(len(col_count)):
             col_count[i] = (255 -col_count[i])
         
-        fit_col = np.polyfit(np.arange(0,img.shape[1]),col_count,2)
-        print(fit_col)
-        print()
-        aprox_col = np.arange(0,img.shape[1])
-        for i in range(len(col_count)):
-            
-            aprox_col[i] = fit_col[0]*aprox_col[i]**2 + aprox_col[i]*fit_col[1] + fit_col[2] 
-        plt.plot( aprox_col)
-        plt.show()
-
-        '''
+        row_count = np.array(row_count)
+        
+        row_count = row_count - row_count.min()
         media_r = 0
         desvio_r = 0
         media_c = 0
@@ -125,8 +114,48 @@ class EyeModule():
             desvio_r = 0
         if desvio_c is None or desvio_c == [] or desvio_c<0 :
             desvio_c = 0
-        return row_count,col_count,media_c,media_r,desvio_c,desvio_r'''
+        return row_count,col_count,media_c,media_r,desvio_c,desvio_r
+    
+    def analyse_pupil(self,iris_img,iris_borders):
+        #cv2.imshow("left_eye_img",left_eye_img)
+        #  Testes de filtos pra isolar a pupila
+        iris_img = cv2.GaussianBlur(iris_img,(5,5),1)
+        
+        cv2.imshow("left_eye_img_blur",iris_img)
+        o1,o2,o3,o4,o5 = self.apply_otsus(iris_img)
+        b2 = cv2.GaussianBlur(o5,(5,5),1)
+        
+        th2 = cv2.adaptiveThreshold(b2,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            cv2.THRESH_BINARY,11,2)
+        blurred = cv2.bilateralFilter(b2,20,40,50)
 
+        
+        
+        cv2.imshow("b2",b2)
+        
+        cv2.imshow("th2",th2)
+
+        cv2.imshow("blur",blurred)
+        #ret, bin_img = cv2.threshold(blurred,127,255,cv2.THRESH_BINARY)
+        k = int(25*(len(b2.flatten())-1)/100) 
+        print(len(b2.flatten()-1),k)
+        idx = np.argpartition(b2.flatten(), k)
+        #print(idx)
+        print(b2.flatten()[idx[:k]].mean())
+        ret, bin_img = cv2.threshold(b2,b2.flatten()[idx[:k]].mean(),255,cv2.THRESH_BINARY)
+
+
+        
+        
+
+        
+        cv2.imshow("bin_img 1 ",bin_img)
+        row_count,col_count,media_c,media_r,desvio_c,desvio_r =  self.hist_analisys(bin_img)
+        radius = int((desvio_c+desvio_r)/2)
+        print(int(media_c),int(media_r),radius)
+        
+
+        return (int(media_c)+ self._lms[iris_borders[2]][0],int(media_r)+self._lms[iris_borders[1]][1]),radius
     def detect_pupil(self):
         # Read image
         
@@ -135,25 +164,16 @@ class EyeModule():
 
 
         left_eye_img = self.crop_left_eye(gray)
-        right_eye_img = self.crop_right_eye(gray)# font
+        right_eye_img = self.crop_right_eye(gray)
+        
+        left_pupil =  self.analyse_pupil(left_eye_img,LEFT_IRIS)
+        right_pupil = self.analyse_pupil(right_eye_img,RIGHT_IRIS)
+        
         
 
         
-        cv2.imshow("left_eye_img",left_eye_img)
-        #  Testes de filtos pra isolar a pupila
-        left_eye_img = cv2.GaussianBlur(left_eye_img,(5,5),1)
-        
-        cv2.imshow("left_eye_img_blur",left_eye_img)
-        o1,o2,o3,o4,o5 = self.apply_otsus(left_eye_img)
-        
-        cv2.imshow("o5",o5)
-        
-        # [centro, raio]
 
-        #row_count,col_count,media_c,media_r,desvio_c,desvio_r = 
-        self.hist_analisys(o5)
-
-        return [[(100,100),20],[(100,100),20]]
+        return [left_pupil,right_pupil]
        
 
 

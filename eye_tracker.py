@@ -58,6 +58,12 @@ def draw_iris_circles(image,left_iris,right_iris):
     cv2.circle(image, right_iris[0],right_iris[1], (255,0,255), 1, cv2.LINE_AA)
     return image
 
+def draw_pupil_circles(image,left_pupil,right_pupil):
+    cv2.circle(image, left_pupil[0],left_pupil[1], (0,0,255), 1, cv2.LINE_AA)
+    
+    cv2.circle(image, right_pupil[0],right_pupil[1], (0,0,255), 1, cv2.LINE_AA)
+    return image
+
 def draw_past_positions_iris_center(image,positions_data,max_number_draw):
     left_eye,right_eye = positions_data.get_past_n_positions(max_number_draw)
 
@@ -142,12 +148,13 @@ def process_video(path = ""):
             positions_data.add_positions(frame_data)
 
             # desenha as coisas no rosto, descomenta o que não quiser mostrar
-            fimage = draw_face_box(fimage,face_border)
+            #fimage = draw_face_box(fimage,face_border)
             fimage = draw_iris_circles(fimage,left_iris,right_iris)
-            fimage = draw_past_positions_iris_center(fimage,positions_data,20)
-            fimage = draw_face_mesh_points(image=fimage,lms=lms)
+            fimage = draw_pupil_circles(fimage,left_pupil,right_pupil)
+            #fimage = draw_past_positions_iris_center(fimage,positions_data,20)
+            #fimage = draw_face_mesh_points(image=fimage,lms=lms)
             
-            #cv2.imshow("adjusted",fimage)
+            cv2.imshow("adjusted",fimage)
             cv2.waitKey(1)
 
             #print("\nfimage shape ",fimage.shape)
