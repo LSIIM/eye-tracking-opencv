@@ -138,10 +138,10 @@ class EyeModule():
         cv2.imshow("blur",blurred)
         #ret, bin_img = cv2.threshold(blurred,127,255,cv2.THRESH_BINARY)
         k = int(25*(len(b2.flatten())-1)/100) 
-        print(len(b2.flatten()-1),k)
+        #print(len(b2.flatten()-1),k)
         idx = np.argpartition(b2.flatten(), k)
         #print(idx)
-        print(b2.flatten()[idx[:k]].mean())
+        #print(b2.flatten()[idx[:k]].mean())
         ret, bin_img = cv2.threshold(b2,b2.flatten()[idx[:k]].mean(),255,cv2.THRESH_BINARY)
 
 
@@ -152,7 +152,7 @@ class EyeModule():
         cv2.imshow("bin_img 1 ",bin_img)
         row_count,col_count,media_c,media_r,desvio_c,desvio_r =  self.hist_analisys(bin_img)
         radius = int((desvio_c+desvio_r)/2)
-        print(int(media_c),int(media_r),radius)
+        #print(int(media_c),int(media_r),radius)
         
 
         return (int(media_c)+ self._lms[iris_borders[2]][0],int(media_r)+self._lms[iris_borders[1]][1]),radius
