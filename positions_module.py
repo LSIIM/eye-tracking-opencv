@@ -65,16 +65,20 @@ class PositionsModule():
 
         df["left_iris_x"] = left_iris_x 
         df["left_iris_y"] = left_iris_y 
+        df["left_iris_r"] = left_iris_r 
 
         df["right_iris_x"] = right_iris_x 
         df["right_iris_y"] = right_iris_y 
+        df["right_iris_r"] = right_iris_r 
 
 
         df["left_pupil_x"] = left_pupil_x 
         df["left_pupil_y"] = left_pupil_y 
+        df["left_pupil_r"] = left_pupil_r 
 
         df["right_pupil_x"] = right_pupil_x 
         df["right_pupil_y"] = right_pupil_y 
+        df["right_pupil_r"] = right_pupil_r 
 
         df.to_csv(path)
 
