@@ -93,8 +93,11 @@ def process_video(path = ""):
             left_iris, right_iris = eye_module.detect_iris()
 
 
-            left_pupil, right_pupil = eye_module.detect_pupil()
-
+            left_pupil, right_pupil = eye_module.detect_pupil(left_iris, right_iris)
+            if(left_pupil == None):
+                left_iris = None
+            if(right_pupil == None):
+                right_iris = None
             
             #salva as posições
             frame_data.add_left_iris(left_iris)

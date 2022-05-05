@@ -88,20 +88,35 @@ class EyeDataModule():
         self._frame = frame
 
     def add_left_iris(self, left_iris):
-        (x,y),r = left_iris
-        
-        self._left_iris = {
-                    "x": x,
-                    "y": y,
-                    "r": r
-                }
+        if(left_iris):
+            (x,y),r = left_iris
+            
+            self._left_iris = {
+                        "x": x,
+                        "y": y,
+                        "r": r
+                    }
+        else:
+            self._left_iris = {
+                        "x":None,
+                        "y": None,
+                        "r": None
+                    }
     def add_right_iris(self, right_iris):
-        (x,y),r = right_iris
-        self._right_iris = {
-                    "x": x,
-                    "y": y,
-                    "r": r
-                }
+        if(right_iris):
+            (x,y),r = right_iris
+            
+            self._right_iris = {
+                        "x": x,
+                        "y": y,
+                        "r": r
+                    }
+        else:
+            self._right_iris = {
+                        "x":None,
+                        "y": None,
+                        "r": None
+                    }
     def add_left_pupil(self, left_pupil):
         if(left_pupil):
             (x,y),r = left_pupil

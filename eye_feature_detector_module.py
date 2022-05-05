@@ -26,6 +26,27 @@ class EyeModule():
         #top,left,bottom,right
         return self._lms[257][1],self._lms[463][0],self._lms[253][1],self._lms[263][0]
     
+    
+    # funções auxiliares para detecção da iris
+    def _face_left(self):
+        lowest = None
+        for lm in self._lms:
+            if lowest == None:
+                lowest = lm[0]
+                continue
+            if lm[0] < lowest:
+                lowest = lm[0]
+        return lowest
+
+    def _face_right(self):
+        highest = None
+        for lm in self._lms:
+            if highest == None:
+                highest = lm[0]
+                continue
+            if lm[0] > highest:
+                highest = lm[0]
+        return highest
 
     def detect_iris(self):
         left_iris_points_pos = []
@@ -37,12 +58,18 @@ class EyeModule():
         
 
         (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(np.array(right_iris_points_pos))
+        if(r_cx<(self._face_left()-face_margin) or r_cy<0 or r_cx>(self._face_right()+face_margin) or r_cy>self._img.shape[0]):
+            riris = None
         center_right = np.array([r_cx, r_cy], dtype=np.int32)
-        
+        riris =[center_right,int(r_radius)]
 
         (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(np.array(left_iris_points_pos))
+        
+        if(l_cx<(self._face_left()-face_margin) or l_cy<0 or l_cx>(self._face_right()+face_margin) or l_cy>self._img.shape[0]):
+            liris = None
         center_left = np.array([l_cx, l_cy], dtype=np.int32)
-        return [[center_left, int(l_radius)],[center_right,int(r_radius)]]
+        liris =[center_left, int(l_radius)] 
+        return [liris,riris]
 
 
         
@@ -53,7 +80,9 @@ class EyeModule():
             self._lms[LEFT_IRIS[2]][0]:self._lms[LEFT_IRIS[0]][0]]
         
     def crop_right_eye(self, img):
-        return img[self._lms[RIGHT_IRIS[1]][1]:self._lms[RIGHT_IRIS[3]][1],self._lms[RIGHT_IRIS[2]][0]:self._lms[RIGHT_IRIS[0]][0]]
+        return img[
+            self._lms[RIGHT_IRIS[1]][1]:self._lms[RIGHT_IRIS[3]][1],
+            self._lms[RIGHT_IRIS[2]][0]:self._lms[RIGHT_IRIS[0]][0]]
 
     def apply_otsus(self,img):
         ret, o1 = cv2.threshold(img,0,255, cv2.THRESH_BINARY + cv2.THRESH_OTSU )
@@ -156,7 +185,7 @@ class EyeModule():
         
 
         return (int(media_c)+ self._lms[iris_borders[2]][0],int(media_r)+self._lms[iris_borders[1]][1]),radius
-    def detect_pupil(self):
+    def detect_pupil(self,left_iris,right_iris):
         # Read image
         
         gray = self.convert_to_gray_scale(self._img)
@@ -166,14 +195,20 @@ class EyeModule():
         left_eye_img = self.crop_left_eye(gray)
         right_eye_img = self.crop_right_eye(gray)
         
-        try:
-            left_pupil =  self.analyse_pupil(left_eye_img,LEFT_IRIS)
-        except:
+        if(left_iris):
+            try:
+                left_pupil =  self.analyse_pupil(left_eye_img,LEFT_IRIS)
+            except:
+                left_pupil = None
+        else:
             left_pupil = None
-        try:
-            right_pupil = self.analyse_pupil(right_eye_img,RIGHT_IRIS)
-        except:
-            right_pupil = None
+        if(right_iris):
+            try:
+                right_pupil = self.analyse_pupil(right_eye_img,RIGHT_IRIS)
+            except:
+                right_pupil = None
+        else:
+                right_pupil = None
         
         
 
