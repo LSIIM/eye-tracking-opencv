@@ -99,6 +99,8 @@ def process_video(path = ""):
             #salva as posições
             frame_data.add_left_iris(left_iris)
             frame_data.add_right_iris(right_iris)
+            frame_data.add_left_pupil(left_pupil)
+            frame_data.add_right_pupil(right_pupil)
 
 
             #salva os dados totais

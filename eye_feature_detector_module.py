@@ -166,8 +166,14 @@ class EyeModule():
         left_eye_img = self.crop_left_eye(gray)
         right_eye_img = self.crop_right_eye(gray)
         
-        left_pupil =  self.analyse_pupil(left_eye_img,LEFT_IRIS)
-        right_pupil = self.analyse_pupil(right_eye_img,RIGHT_IRIS)
+        try:
+            left_pupil =  self.analyse_pupil(left_eye_img,LEFT_IRIS)
+        except:
+            left_pupil = None
+        try:
+            right_pupil = self.analyse_pupil(right_eye_img,RIGHT_IRIS)
+        except:
+            right_pupil = None
         
         
 

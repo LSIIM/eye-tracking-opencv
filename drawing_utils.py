@@ -15,14 +15,17 @@ def draw_face_box(image,face_border):
     return image
 
 def draw_iris_circles(image,left_iris,right_iris):
-    cv2.circle(image, left_iris[0],left_iris[1], (255,0,255), 1, cv2.LINE_AA)
-    cv2.circle(image, right_iris[0],right_iris[1], (255,0,255), 1, cv2.LINE_AA)
+    if(left_iris):
+        cv2.circle(image, left_iris[0],left_iris[1], (255,0,255), 1, cv2.LINE_AA)
+    if(right_iris):
+        cv2.circle(image, right_iris[0],right_iris[1], (255,0,255), 1, cv2.LINE_AA)
     return image
 
 def draw_pupil_circles(image,left_pupil,right_pupil):
-    cv2.circle(image, left_pupil[0],left_pupil[1], (0,0,255), 1, cv2.LINE_AA)
-    
-    cv2.circle(image, right_pupil[0],right_pupil[1], (0,0,255), 1, cv2.LINE_AA)
+    if(left_pupil):
+        cv2.circle(image, left_pupil[0],left_pupil[1], (0,0,255), 1, cv2.LINE_AA)
+    if(right_pupil):
+        cv2.circle(image, right_pupil[0],right_pupil[1], (0,0,255), 1, cv2.LINE_AA)
     return image
 
 def draw_past_positions_iris_center(image,positions_data,max_number_draw):

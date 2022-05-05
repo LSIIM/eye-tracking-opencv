@@ -103,20 +103,34 @@ class EyeDataModule():
                     "r": r
                 }
     def add_left_pupil(self, left_pupil):
-        (x,y),r = left_pupil
-        
-        self._left_pupil = {
-                    "x": x,
-                    "y": y,
-                    "r": r
-                }
+        if(left_pupil):
+            (x,y),r = left_pupil
+            
+            self._left_pupil = {
+                        "x": x,
+                        "y": y,
+                        "r": r
+            }
+        else:
+            self._left_pupil = {
+                "x": None,
+                "y": None,
+                "r": None
+            }
     def add_right_pupil(self, right_pupil):
-        (x,y),r = right_pupil
-        
-        self._right_pupil = {
-                    "x": x,
-                    "y": y,
-                    "r": r
-                }
+        if(right_pupil):
+            (x,y),r = right_pupil
+            
+            self._right_pupil = {
+                        "x": x,
+                        "y": y,
+                        "r": r
+            }
+        else:
+            self._right_pupil = {
+                "x": None,
+                "y": None,
+                "r": None
+            }
 
         
