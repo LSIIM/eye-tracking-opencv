@@ -126,6 +126,11 @@ def process_video(path = ""):
     cv2.destroyAllWindows()
     positions_data.save_data(path+"/positions.csv")
 if __name__=="__main__":
-    for video in tqdm(os.listdir('./vds/raw')):
-            process_video(path = "./vds/raw/"+video)
+    
+    videos = os.listdir('./vds/raw')
+    if(len(videos)>0):
+        for video in tqdm(videos):
+                process_video(path = "./vds/raw/"+video)
+    else:
+        print("Não há videos na pasta raw para serem analisados")
     
