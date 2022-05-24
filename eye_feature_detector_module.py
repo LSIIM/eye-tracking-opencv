@@ -150,7 +150,7 @@ class EyeModule():
         #  Testes de filtos pra isolar a pupila
         iris_img = cv2.GaussianBlur(iris_img,(5,5),1)
         
-        cv2.imshow("left_eye_img_blur",iris_img)
+        #cv2.imshow("left_eye_img_blur",iris_img)
         o1,o2,o3,o4,o5 = self.apply_otsus(iris_img)
         b2 = cv2.GaussianBlur(o5,(5,5),1)
         
@@ -160,11 +160,11 @@ class EyeModule():
 
         
         
-        cv2.imshow("b2",b2)
+        #cv2.imshow("b2",b2)
         
-        cv2.imshow("th2",th2)
+        #cv2.imshow("th2",th2)
 
-        cv2.imshow("blur",blurred)
+        #cv2.imshow("blur",blurred)
         #ret, bin_img = cv2.threshold(blurred,127,255,cv2.THRESH_BINARY)
         k = int(25*(len(b2.flatten())-1)/100) 
         #print(len(b2.flatten()-1),k)
@@ -178,7 +178,7 @@ class EyeModule():
         
 
         
-        cv2.imshow("bin_img 1 ",bin_img)
+        #cv2.imshow("bin_img 1 ",bin_img)
         row_count,col_count,media_c,media_r,desvio_c,desvio_r =  self.hist_analisys(bin_img)
         radius = int((desvio_c+desvio_r)/2)
         #print(int(media_c),int(media_r),radius)

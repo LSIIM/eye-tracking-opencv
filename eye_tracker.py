@@ -14,7 +14,7 @@ from eye_feature_detector_module import EyeModule
 from definitions import *
 from drawing_utils import *
 
-def adjustFace(image, extractor):
+def adjustFace(image, extractor,show_warnings):
     row, col = image.shape[:2]
     img_new_width = initial_image_width
     rt = img_new_width/col
@@ -22,7 +22,8 @@ def adjustFace(image, extractor):
     lms = extractor.findFaceMesh(image.copy())
     
     if(lms is None):
-        print("\nNo faces")
+        if(show_warnings == 's'):
+            print("\nNo faces")
         return [], "No Faces detected"
     
     # --------------------------------------------------------------------------
@@ -50,7 +51,7 @@ def adjustFace(image, extractor):
 
 
 
-def process_video(path = ""):
+def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings):
     camera = cv2.VideoCapture( str(path))
     vfps = (camera.get(cv2.CAP_PROP_FPS))
 
@@ -82,11 +83,12 @@ def process_video(path = ""):
             clear_image = frame.copy()
             try:
                 face_border,lms, fimage, err = adjustFace(
-                    clear_image, landmarks_extractor)
+                    clear_image, landmarks_extractor,show_warnings)
             except Exception as exception:
                 err = type(exception).__name__
-                print()
-                print(err)
+                if(show_warnings == 's'):
+                    print()
+                    print(err)
                 continue
 
 
@@ -111,15 +113,24 @@ def process_video(path = ""):
             #salva os dados totais
             positions_data.add_positions(frame_data)
 
-            # desenha as coisas no rosto, descomenta o que não quiser mostrar
-            #fimage = draw_face_box(fimage,face_border)
-            fimage = draw_iris_circles(fimage,left_iris,right_iris)
-            fimage = draw_pupil_circles(fimage,left_pupil,right_pupil)
-            #fimage = draw_past_positions_iris_center(fimage,positions_data,20)
-            #fimage = draw_face_mesh_points(image=fimage,lms=lms)
+            # desenha as coisas no rosto   
+
+            if(draw_bb == 's'):
+                fimage = draw_face_box(fimage,face_border)
+            if(draw_iris == 's'):
+                fimage = draw_iris_circles(fimage,left_iris,right_iris)
+            if(draw_pupil == 's'):
+                fimage = draw_pupil_circles(fimage,left_pupil,right_pupil)
+            if(draw_past_pos == 's'):
+                fimage = draw_past_positions_iris_center(fimage,positions_data,20)
+            if(draw_mask_points == 's'):
+                fimage = draw_face_mesh_points(image=fimage,lms=lms)
+
+
             
-            cv2.imshow("adjusted",fimage)
-            cv2.waitKey(1)
+            if(show_process == 's'):   
+                cv2.imshow("adjusted",fimage)
+                cv2.waitKey(1)
 
             #print("\nfimage shape ",fimage.shape)
             
@@ -129,15 +140,22 @@ def process_video(path = ""):
     positions_data.save_data(path+"/positions.csv")
 
 if __name__=="__main__":
-    paths = []
+
+    print("As respostas a seguir serão usadas em todos os videos do processamento em lote!")
+    show_process = str(input("(Isso pode implicar em perda de performance) Deseja mostrar o processo frame a frame? s/n ")).lower()
+    draw_bb = str(input("Deseja desenhar uma borda ao redor do rosto? s/n ")).lower()
+    draw_iris = str(input("Deseja desenhar os circulos da iris? s/n ")).lower()
+    draw_pupil = str(input("Deseja desenhar os circulos das pupilas? s/n ")).lower()
+    draw_past_pos = str(input("Deseja desenhar a linha com o rastreio das posições passadas? s/n ")).lower()
+    draw_mask_points = str(input("Deseja desenhar os pontos da mascara no rosto? s/n ")).lower()
+    show_warnings = str(input("Deseja que o mostre os avisos? s/n ")).lower()
+
     for root, dirs, files in os.walk('./vds/raw'):
-        #print(root,dirs,files)
         nprc_path = './vds/prc'+root.split("raw")[1]
-        #print(nprc_path)
         try:
             os.mkdir(nprc_path )
         except:
             None
         for file in files:
             print(root + '/' + file)
-            process_video(path = root + '/' + file)
+            process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings)
