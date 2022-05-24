@@ -61,7 +61,6 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
     name = path.split('/')
     name = name[len(name)-1].split('.')
     name = name[0]
-    
     nprc_path = './vds/prc'+path.split("raw")[1].split(".")[0]
     try:
         os.mkdir(nprc_path )
@@ -72,7 +71,7 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
             return
     path = nprc_path+  "/"
     name =  nprc_path +'/video.avi'
-    print("Processando: "+ path)
+    print("\nProcessando: "+ path)
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
     
@@ -152,7 +151,8 @@ def find_videos(show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mas
         except:
             None
         for file in files:
-            process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)
+            if(file.split(".")[1]=="avi" or file.split(".")[1]=="mp4"):
+                process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)
 
 if __name__=="__main__":
 

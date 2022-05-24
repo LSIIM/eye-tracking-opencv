@@ -15,3 +15,13 @@ Para rodar o programa:
 - `pipenv shell`
 - `pipenv install`
 - `python eye_tracker.py`
+
+## Criar o executavel
+
+```
+$ pipenv run pyinstaller --onefile --paths C:\Users\Rodrigo\.virtualenvs\eye-tracking-opencv-2R_2QBtr ./eye_tracker.py --add-data 'C:\Users\Rodrigo\.virtualenvs\eye-tracking-opencv-2R_2QBtr\Lib\site-packages\mediapipe\modules:mediapipe/modules' --add-data 'C:\Users\Rodrigo\.virtualenvs\eye-tracking-opencv-2R_2QBtr\Lib\site-packages\mediapipe\python\solutions:mediapipe/solutions'
+```
+
+## Regras
+
+PROIBIDO colocar pastas que contenham o caractere '.' no nome dentro do diretório /raw para o processamento em lote
