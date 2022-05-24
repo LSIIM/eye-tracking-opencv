@@ -51,7 +51,7 @@ def adjustFace(image, extractor,show_warnings):
 
 
 
-def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings):
+def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite):
     camera = cv2.VideoCapture( str(path))
     vfps = (camera.get(cv2.CAP_PROP_FPS))
 
@@ -65,7 +65,10 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
     try:
         os.mkdir(nprc_path )
     except:
-        print("Diretorio ja existe")
+        if(show_warnings == 's'):   
+            print("Diretorio ja existe")
+        if(overwrite == 'n'):
+            return
     path = nprc_path+  "/"
     name =  nprc_path +'/video.avi'
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -149,6 +152,7 @@ if __name__=="__main__":
     draw_past_pos = str(input("Deseja desenhar a linha com o rastreio das posições passadas? s/n ")).lower()
     draw_mask_points = str(input("Deseja desenhar os pontos da mascara no rosto? s/n ")).lower()
     show_warnings = str(input("Deseja que o mostre os avisos? s/n ")).lower()
+    overwrite = str(input("Caso haja sobreposição dos processamentos, deseja sobrescrever o arquivo? s/n "))
 
     for root, dirs, files in os.walk('./vds/raw'):
         nprc_path = './vds/prc'+root.split("raw")[1]
@@ -158,4 +162,4 @@ if __name__=="__main__":
             None
         for file in files:
             print(root + '/' + file)
-            process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings)
+            process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)
