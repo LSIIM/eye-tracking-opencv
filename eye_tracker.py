@@ -61,7 +61,7 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
     name = name[len(name)-1].split('.')
     name = name[0]
     
-    nprc_path = './vds/prc'+path.split("raw")[1]
+    nprc_path = './vds/prc'+path.split("raw")[1].split(".")[0]
     try:
         os.mkdir(nprc_path )
     except:
