@@ -59,12 +59,14 @@ def process_video(path = ""):
     name = path.split('/')
     name = name[len(name)-1].split('.')
     name = name[0]
+    
+    nprc_path = './vds/prc'+path.split("raw")[1]
     try:
-        os.mkdir(prc_path+"/"+name )
+        os.mkdir(nprc_path )
     except:
         print("Diretorio ja existe")
-    path = prc_path+ '/' + name + "/"
-    name =  prc_path+"/"+name + '/video.avi'
+    path = nprc_path+  "/"
+    name =  nprc_path +'/video.avi'
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
     
@@ -125,12 +127,17 @@ def process_video(path = ""):
     camera.release()
     cv2.destroyAllWindows()
     positions_data.save_data(path+"/positions.csv")
+
 if __name__=="__main__":
-    
-    videos = os.listdir('./vds/raw')
-    if(len(videos)>0):
-        for video in tqdm(videos):
-                process_video(path = "./vds/raw/"+video)
-    else:
-        print("Não há videos na pasta raw para serem analisados")
-    
+    paths = []
+    for root, dirs, files in os.walk('./vds/raw'):
+        #print(root,dirs,files)
+        nprc_path = './vds/prc'+root.split("raw")[1]
+        #print(nprc_path)
+        try:
+            os.mkdir(nprc_path )
+        except:
+            None
+        for file in files:
+            print(root + '/' + file)
+            process_video(path = root + '/' + file)
