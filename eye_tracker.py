@@ -6,6 +6,7 @@ import math
 from tqdm import tqdm
 import pandas as pd
 
+from multiprocessing import Process
 
 from positions_module import EyeDataModule, PositionsModule
 from face_adjustments_module import FaceAdjuster
@@ -71,6 +72,7 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
             return
     path = nprc_path+  "/"
     name =  nprc_path +'/video.avi'
+    print("Processando: "+ path)
     vLength = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
     #file = open(path+"data.pickle", 'rb')
     
@@ -142,6 +144,16 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
     cv2.destroyAllWindows()
     positions_data.save_data(path+"/positions.csv")
 
+def find_videos(show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite):
+    for root, dirs, files in os.walk('./vds/raw'):
+        nprc_path = './vds/prc'+root.split("raw")[1]
+        try:
+            os.mkdir(nprc_path )
+        except:
+            None
+        for file in files:
+            process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)
+
 if __name__=="__main__":
 
     print("As respostas a seguir serão usadas em todos os videos do processamento em lote!")
@@ -152,14 +164,26 @@ if __name__=="__main__":
     draw_past_pos = str(input("Deseja desenhar a linha com o rastreio das posições passadas? s/n ")).lower()
     draw_mask_points = str(input("Deseja desenhar os pontos da mascara no rosto? s/n ")).lower()
     show_warnings = str(input("Deseja que o mostre os avisos? s/n ")).lower()
-    overwrite = str(input("Caso haja sobreposição dos processamentos, deseja sobrescrever o arquivo? s/n "))
 
-    for root, dirs, files in os.walk('./vds/raw'):
-        nprc_path = './vds/prc'+root.split("raw")[1]
-        try:
-            os.mkdir(nprc_path )
-        except:
-            None
-        for file in files:
-            print(root + '/' + file)
-            process_video(root + '/' + file,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)
+    use_multicore = str(input("Deseja executar o programa em multicore? s/n ")).lower()
+    if(use_multicore == 'n'):
+        overwrite = str(input("Caso haja sobreposição dos processamentos, deseja sobrescrever o arquivo? s/n ")).lower()
+        find_videos(show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)
+    else:
+        overwrite = 'n'
+        processes = []
+        ncpu = int(os.cpu_count()/2)
+        print(f'Inicializando processamento multicore com {ncpu} nucleos')
+        for i in range(ncpu):
+            processes.append(Process(target=find_videos,args=(show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite)))
+
+        for process in processes:
+            process.start()
+
+
+        for process in processes:
+            process.join()
+
+
+
+    
