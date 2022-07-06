@@ -8,8 +8,8 @@ class FaceMeshDetector():
     def __init__(self,
                  staticImageMode=True,  # False se analisar video
                  maxNumFaces=1,
-                 minDetectionConfidence=0.5,
-                 minTrackingConfidence=0.5):
+                 minDetectionConfidence=0.8,
+                 minTrackingConfidence=0.8):
 
         self._staticImageMode = bool(staticImageMode)
         self._maxNumFaces = int(maxNumFaces)

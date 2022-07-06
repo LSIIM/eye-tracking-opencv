@@ -90,7 +90,17 @@ class EyeDataModule():
         self._left_pupil = None
         self._right_pupil = None
         self._frame = frame
-
+    def print_data(self):
+        print(f'\nFrame: {self._frame}')
+        print("\nLeft Iris:")
+        print(self._left_iris)
+        print("\nRight Iris:")
+        print(self._right_iris)
+        print("\nLeft Pupil:")
+        print(self._left_pupil)
+        print("\nRight Pupil:")
+        print(self._right_pupil)
+        print("\n-------------------------------------")
     def add_left_iris(self, left_iris):
         if(left_iris):
             (x,y),r = left_iris

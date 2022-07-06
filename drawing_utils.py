@@ -15,6 +15,8 @@ def draw_face_box(image,face_border):
     return image
 
 def draw_iris_circles(image,left_iris,right_iris):
+    if(left_iris == 0 or right_iris == 0):
+        return image
     if(left_iris):
         cv2.circle(image, left_iris[0],left_iris[1], (255,0,255), 1, cv2.LINE_AA)
     if(right_iris):
@@ -22,6 +24,8 @@ def draw_iris_circles(image,left_iris,right_iris):
     return image
 
 def draw_pupil_circles(image,left_pupil,right_pupil):
+    if(left_pupil == 0 or right_pupil == 0):
+        return image
     if(left_pupil):
         cv2.circle(image, left_pupil[0],left_pupil[1], (0,0,255), 1, cv2.LINE_AA)
     if(right_pupil):
@@ -31,9 +35,22 @@ def draw_pupil_circles(image,left_pupil,right_pupil):
 def draw_past_positions_iris_center(image,positions_data,max_number_draw):
     left_eye,right_eye = positions_data.get_past_n_positions(max_number_draw)
 
+    left_eye_printable = [] # tirei os 0,0 que eu coloco quando não acho nada
     for i in range(1,len(left_eye)):
-        end_point=left_eye[i]
-        start_point=left_eye[i-1]
+        if(left_eye[i]==0 or left_eye[i]==None or left_eye[i]=="" ):
+            continue
+        else:
+            left_eye_printable.append(left_eye[i])
+    right_eye_printable = [] # tirei os 0,0 que eu coloco quando não acho nada
+    for i in range(1,len(right_eye)):
+        if(right_eye[i]==0 or right_eye[i]==None or right_eye[i]=="" ):
+            continue
+        else:
+            right_eye_printable.append(right_eye[i])
+
+    for i in range(1,len(left_eye_printable)):
+        end_point=left_eye_printable[i]
+        start_point=left_eye_printable[i-1]
         if i == 1:
             color = (255,0,0)
         else:
@@ -41,9 +58,9 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
         thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
         image = cv2.line(image, start_point, end_point, color, thickness)
 
-    for i in range(1,len(right_eye)):
-        end_point=right_eye[i]
-        start_point=right_eye[i-1]
+    for i in range(1,len(right_eye_printable)):
+        end_point=right_eye_printable[i]
+        start_point=right_eye_printable[i-1]
         if i ==1:
             color = (255,0,0)
         else:
