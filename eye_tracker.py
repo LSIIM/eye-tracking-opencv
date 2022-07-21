@@ -29,7 +29,7 @@ def adjustFace(image, extractor,show_warnings):
     
     # --------------------------------------------------------------------------
     adjuster = FaceAdjuster(image.copy(), lms)
-    _, succeed = adjuster.alignEyes()
+    '''_, succeed = adjuster.alignEyes()
     if not succeed:
         return [],[], adjuster.error
     _, succeed = adjuster.alignFace()
@@ -40,7 +40,7 @@ def adjustFace(image, extractor,show_warnings):
         return [],[], adjuster.error
     _, succeed = adjuster.alignFace()
     if not succeed:
-        return [],[], adjuster.error
+        return [],[], adjuster.error'''
     finalImage, succeed = adjuster.fixImageSizeWithBorders()
     if not succeed:
         return [],[], adjuster.error
@@ -51,7 +51,7 @@ def adjustFace(image, extractor,show_warnings):
     return face_border,nlms, finalImage, None
 
 
-
+ 
 def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,draw_mask_points,show_warnings,overwrite):
     camera = cv2.VideoCapture( str(path))
     vfps = (camera.get(cv2.CAP_PROP_FPS))
@@ -61,6 +61,9 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
     name = path.split('/')
     name = name[len(name)-1].split('.')
     name = name[0]
+    #print(name)
+    if(name == "auxiliary"):
+        return
     nprc_path = './vds/prc'+path.split("raw")[1].split(".")[0]
     try:
         os.mkdir(nprc_path )
@@ -134,7 +137,8 @@ def process_video(path,show_process,draw_bb,draw_iris,draw_pupil,draw_past_pos,d
             
             if(show_process == 's'):   
                 cv2.imshow("adjusted",fimage)
-                cv2.waitKey(1)
+                frame_data.print_data()
+                cv2.waitKey()
 
             #print("\nfimage shape ",fimage.shape)
             

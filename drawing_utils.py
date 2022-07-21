@@ -15,7 +15,7 @@ def draw_face_box(image,face_border):
     return image
 
 def draw_iris_circles(image,left_iris,right_iris):
-    if(left_iris == 0 or right_iris == 0):
+    if(left_iris == 0 or right_iris == 0 or left_iris == None or right_iris == None):
         return image
     if(left_iris):
         cv2.circle(image, left_iris[0],left_iris[1], (255,0,255), 1, cv2.LINE_AA)
@@ -24,7 +24,7 @@ def draw_iris_circles(image,left_iris,right_iris):
     return image
 
 def draw_pupil_circles(image,left_pupil,right_pupil):
-    if(left_pupil == 0 or right_pupil == 0):
+    if(left_pupil == 0 or right_pupil == 0 or left_pupil == None or right_pupil == None):
         return image
     if(left_pupil):
         cv2.circle(image, left_pupil[0],left_pupil[1], (0,0,255), 1, cv2.LINE_AA)
@@ -51,22 +51,28 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
     for i in range(1,len(left_eye_printable)):
         end_point=left_eye_printable[i]
         start_point=left_eye_printable[i-1]
+        if(start_point == [None,None] or end_point == [None,None]):
+            continue
         if i == 1:
             color = (255,0,0)
         else:
             color = (0,0,255)
         thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
         image = cv2.line(image, start_point, end_point, color, thickness)
+        #print(f'Left eye Line start: {start_point} | Line end: {end_point}')
 
     for i in range(1,len(right_eye_printable)):
         end_point=right_eye_printable[i]
         start_point=right_eye_printable[i-1]
+        if(start_point == [None,None] or end_point == [None,None]):
+            continue
         if i ==1:
             color = (255,0,0)
         else:
             color = (0,0,255)
         thickness =int(max_number_draw/(2*i+max_number_draw/3))+1
         image = cv2.line(image, start_point, end_point, color, thickness)
+        #print(f'Right eye Line start: {start_point} | Line end: {end_point}')
     return image
 
 def draw_face_mesh_points(image, lms,color = (0,0,255)):

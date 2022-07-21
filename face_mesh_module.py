@@ -6,11 +6,11 @@ from definitions import *
 
 class FaceMeshDetector():
     def __init__(self,
-                 staticImageMode=True,  # False se analisar video
+                 staticImageMode=False,  # False se analisar video
                  maxNumFaces=1,
-                 minDetectionConfidence=0.8,
-                 minTrackingConfidence=0.8):
-
+                 minDetectionConfidence=0.75,
+                 minTrackingConfidence=0.65): # esse aqui é ignorado se static for True
+ 
         self._staticImageMode = bool(staticImageMode)
         self._maxNumFaces = int(maxNumFaces)
         self._minDetectionConfidence = float(minDetectionConfidence)
@@ -20,11 +20,11 @@ class FaceMeshDetector():
         self._mpFaceMesh = mp.solutions.face_mesh
 
         self._faceMesh = self._mpFaceMesh.FaceMesh(
-                refine_landmarks=True,
-                max_num_faces=self._maxNumFaces,
-                min_detection_confidence=self._minDetectionConfidence,
-                static_image_mode=self._staticImageMode,
-                min_tracking_confidence=self._minTrackingConfidence)
+                    refine_landmarks=True,
+                    max_num_faces=self._maxNumFaces,
+                    min_detection_confidence=self._minDetectionConfidence,
+                    static_image_mode=self._staticImageMode,
+                    min_tracking_confidence=self._minTrackingConfidence)
 
         self._drawSpec = self._mpDraw.DrawingSpec(thickness=1, circle_radius=2)
 
