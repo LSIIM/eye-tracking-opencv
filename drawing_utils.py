@@ -75,7 +75,7 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
         #print(f'Right eye Line start: {start_point} | Line end: {end_point}')
     return image
 
-def draw_face_mesh_points(image, lms,color = (0,0,255)):
+def draw_face_mesh_points(image, lms,color = (0,255,0)):
     for lm in lms:
         image = cv2.circle(image, (lm), radius=1, color=color, thickness=-1)
     return image

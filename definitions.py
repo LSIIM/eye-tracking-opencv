@@ -1,10 +1,10 @@
-final_image_size_height = 850
+final_image_size_height = 650
 final_image_size_width = 1240
 
-initial_image_width = 1240
+initial_image_width = 700
 
 p10_height = 25
-face_height = 600
+face_height = 400
 face_margin = 25
 
 
