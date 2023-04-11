@@ -88,7 +88,6 @@ class FaceDataModule():
     def add_gaze_data(self, data):
         if(data is not None):
             x,y,z = data
-            print(f'Gaze: {x}, {y}, {z}')
             self._gaze = {
                 "x": x,
                 "y": y,

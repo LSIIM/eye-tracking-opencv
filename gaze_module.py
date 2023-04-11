@@ -19,7 +19,6 @@ class GazeEstimator():
                     nose_3d = (lm[0] , lm[1] , lm[2]*3000 )
 
                 x, y = int(lm[0] ), int(lm[1] )
-                print(idx, x, y)    
 
                 # Get the 2D Coordinates
                 self.face_2d.append([x, y])
