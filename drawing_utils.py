@@ -2,10 +2,7 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from positions_module import EyeDataModule, PositionsModule
-from face_adjustments_module import FaceAdjuster
-from face_mesh_module import FaceMeshDetector
-from eye_feature_detector_module import EyeModule
+
 from definitions import *
 
 
@@ -77,5 +74,6 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
 
 def draw_face_mesh_points(image, lms,color = (0,255,0)):
     for lm in lms:
+        lm = lm[:2]
         image = cv2.circle(image, (lm), radius=1, color=color, thickness=-1)
     return image
