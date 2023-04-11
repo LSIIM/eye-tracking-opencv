@@ -5,6 +5,14 @@ import pandas as pd
 
 from definitions import *
 
+def draw_gaze(image, gaze_vector, nose_2d):
+    x,y,z = gaze_vector
+    p1 = (int(nose_2d[0]), int(nose_2d[1]))
+    p2 = (int(nose_2d[0] + y*10), int(nose_2d[1] - x*10))
+
+    image = cv2.line(image, p1, p2, (0, 0, 255), 2)
+    return image
+
 
 def draw_face_box(image,face_border):
     top, left, bottom, right = face_border

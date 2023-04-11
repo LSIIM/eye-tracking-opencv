@@ -9,9 +9,6 @@ import pandas as pd
 from multiprocessing import Process
 
 from positions_module import FaceDataModule, PositionsModule
-# from face_adjustments_module import FaceAdjuster
-from face_mesh_module import FaceMeshDetector
-from eye_feature_detector_module import EyeModule
 from definitions import *
 from drawing_utils import *
 
@@ -28,7 +25,7 @@ global_options = {
     'show_warnings': None,
     'use_multicore': None,
     'overwrite': None,
-    
+    'show_gaze': None
 }
 
 def getVideoProperties(path):
@@ -83,19 +80,21 @@ def process_video(path):
             
             face_info = Face(frame, logging = global_options['show_warnings'])
             face_info.detect_face()
-            if(face_info.lms is not None):
+            if(face_info.lms_3d is not None):
                 
                 face_info.init_eye_module()
                 face_info.detect_iris()
                 face_info.detect_pupil()
 
+                face_info.detect_gaze()
+
                 # salva os dados da face
-                face_data_dict = face_info.get_data_as_dict()
+                face_data_dict = face_info.get_position_data_as_dict()
                 # para cada chave do dicionario, salva o valor no dicionario de dados
                 for key in face_data_dict:
                     frame_data.add_position_data(face_data_dict[key],key)
                 
-                
+                frame_data.add_gaze_data(face_info.gaze_vector)
 
                 # desenha os dados da face
                 if (global_options['draw_bb']):
@@ -109,7 +108,9 @@ def process_video(path):
                     frame = draw_past_positions_iris_center(
                         frame, positions_data, 100)
                 if (global_options['draw_mask_points']):
-                    frame = draw_face_mesh_points(image=frame, lms=face_info.lms)
+                    frame = draw_face_mesh_points(image=frame, lms=face_info.lms_2d)
+                if (global_options['show_gaze']):
+                    frame = draw_gaze(frame, face_info.gaze_vector, face_info.nose_2d)
 
             if (global_options['show_process']):
                 cv2.imshow('frame', frame)
@@ -163,6 +164,9 @@ if __name__ == "__main__":
     
     draw_mask_points = str(input("Deseja desenhar os pontos da mascara no rosto? s/n ")).lower()
     global_options['draw_mask_points'] = draw_mask_points == 's'
+
+    show_gaze = str(input("Deseja mostrar o ponto de foco do olhar? s/n ")).lower()
+    global_options['show_gaze'] = show_gaze == 's'
     
     show_warnings = str(input("Deseja que o mostre os avisos? s/n ")).lower() 
     global_options['show_warnings'] = show_warnings == 's'

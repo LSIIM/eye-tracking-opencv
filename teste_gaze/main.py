@@ -49,6 +49,7 @@ while cap.isOpened():
                         nose_3d = (lm.x * img_w, lm.y * img_h, lm.z * 3000)
 
                     x, y = int(lm.x * img_w), int(lm.y * img_h)
+                    print(idx, x, y)
 
                     # Get the 2D Coordinates
                     face_2d.append([x, y])
@@ -59,7 +60,7 @@ while cap.isOpened():
             # convert to np
             face_2d = np.array(face_2d, dtype=np.float64)
             face_3d = np.array(face_3d, dtype=np.float64)
-
+            print(face_3d)
             # the cara matrix
             focal_length = 1 * img_w
 
@@ -106,6 +107,8 @@ while cap.isOpened():
 
     end = time.time()
     total_time = end - start
+    if total_time == 0:
+        total_time = 0.000000001
     fps = 1 / total_time
     cv2.putText(image, f'FPS: {int(fps)}', (20, 70),
                 cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 3)

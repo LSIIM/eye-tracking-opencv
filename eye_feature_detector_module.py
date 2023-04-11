@@ -16,7 +16,7 @@ class EyeModule():
         self._img = image
         self._pupil = None
         # dropa a informação z dos pontos e fica só com o x,y para cada lms
-        self._lms = [lm[:2] for lm in lms]
+        self._lms = lms
         self._left_eye_img = None
         self._right_eye_img = None
 

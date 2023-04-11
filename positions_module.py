@@ -51,8 +51,11 @@ class PositionsModule():
 
             'right_pupil_x': [ data._right_pupil['x'] if data._right_pupil is not None else "" for data in self._data],
             'right_pupil_y': [ data._right_pupil['y'] if data._right_pupil is not None else "" for data in self._data],
-            'right_pupil_r': [ data._right_pupil['r'] if data._right_pupil is not None else "" for data in self._data]
+            'right_pupil_r': [ data._right_pupil['r'] if data._right_pupil is not None else "" for data in self._data],
 
+            'gaze_x': [ data._gaze['x'] if data._gaze is not None else "" for data in self._data],
+            'gaze_y': [ data._gaze['y'] if data._gaze is not None else "" for data in self._data],
+            'gaze_z': [ data._gaze['z'] if data._gaze is not None else "" for data in self._data],
         }
 
        
@@ -66,6 +69,7 @@ class FaceDataModule():
         self._right_iris = None
         self._left_pupil = None
         self._right_pupil = None
+        self._gaze = None
         self._frame = frame
         self._height = height
         self._width = width
@@ -81,7 +85,21 @@ class FaceDataModule():
         print(self._right_pupil)
         print("\n-------------------------------------")
 
-    
+    def add_gaze_data(self, data):
+        if(data is not None):
+            x,y,z = data
+            print(f'Gaze: {x}, {y}, {z}')
+            self._gaze = {
+                "x": x,
+                "y": y,
+                "z": z
+            }
+        else:
+            self._gaze = {
+                "x": None,
+                "y": None,
+                "z": None
+            }
 
     def add_position_data(self, data, key):
         if(data is not None):

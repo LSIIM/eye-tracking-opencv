@@ -34,7 +34,7 @@ class FaceMeshDetector():
         img_h, img_w = image.shape[:2]
         if results.multi_face_landmarks:
             # mesh_points=np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
-            mesh_points_3d = np.array([np.multiply([p.x, p.y, p.z], [img_w, img_h, 1000]).astype(int) for p in results.multi_face_landmarks[0].landmark])
+            mesh_points_3d = np.array([np.multiply([p.x, p.y, p.z], [img_w, img_h, 1]).astype(float) for p in results.multi_face_landmarks[0].landmark])
             
             return mesh_points_3d
         else:
