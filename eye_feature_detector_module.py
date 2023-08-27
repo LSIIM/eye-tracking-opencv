@@ -15,6 +15,7 @@ class EyeModule():
         '''
         self._img = image
         self._pupil = None
+        # dropa a informação z dos pontos e fica só com o x,y para cada lms
         self._lms = lms
         self._left_eye_img = None
         self._right_eye_img = None
@@ -62,7 +63,7 @@ class EyeModule():
 
         (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(
             np.array(right_iris_points_pos))
-        if (r_cx < (self._face_left()-face_margin) or r_cy < 0 or r_cx > (self._face_right()+face_margin) or r_cy > self._img.shape[0]):
+        if (r_cx < (self._face_left()-FACE_MARGIN) or r_cy < 0 or r_cx > (self._face_right()+FACE_MARGIN) or r_cy > self._img.shape[0]):
             riris = None
         center_right = np.array([r_cx, r_cy], dtype=np.int32)
         riris = [center_right, int(r_radius)]
@@ -70,7 +71,7 @@ class EyeModule():
         (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(
             np.array(left_iris_points_pos))
 
-        if (l_cx < (self._face_left()-face_margin) or l_cy < 0 or l_cx > (self._face_right()+face_margin) or l_cy > self._img.shape[0]):
+        if (l_cx < (self._face_left()-FACE_MARGIN) or l_cy < 0 or l_cx > (self._face_right()+FACE_MARGIN) or l_cy > self._img.shape[0]):
             liris = None
         center_left = np.array([l_cx, l_cy], dtype=np.int32)
         liris = [center_left, int(l_radius)]

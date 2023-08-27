@@ -2,11 +2,16 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from positions_module import EyeDataModule, PositionsModule
-from face_adjustments_module import FaceAdjuster
-from face_mesh_module import FaceMeshDetector
-from eye_feature_detector_module import EyeModule
+
 from definitions import *
+
+def draw_gaze(image, gaze_vector, nose_2d):
+    x,y,z = gaze_vector
+    p1 = (int(nose_2d[0]), int(nose_2d[1]))
+    p2 = (int(nose_2d[0] + y*10), int(nose_2d[1] - x*10))
+
+    image = cv2.line(image, p1, p2, (0, 0, 255), 2)
+    return image
 
 
 def draw_face_box(image,face_border):
@@ -77,5 +82,6 @@ def draw_past_positions_iris_center(image,positions_data,max_number_draw):
 
 def draw_face_mesh_points(image, lms,color = (0,255,0)):
     for lm in lms:
+        lm = lm[:2]
         image = cv2.circle(image, (lm), radius=1, color=color, thickness=-1)
     return image

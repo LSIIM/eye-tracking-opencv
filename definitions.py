@@ -1,11 +1,11 @@
-final_image_size_height = 650
-final_image_size_width = 1240
+FINAL_IMAGE_SIZE_HEIGHT = 650
+FINAL_IMAGE_SIZE_WIDTH = 1240
 
-initial_image_width = 700
+IMITIAL_IMAGE_WIDTH = 700
 
-p10_height = 25
-face_height = 400
-face_margin = 25
+P10_HEIGHT = 25
+FACE_HEIGHT = 400
+FACE_MARGIN = 25
 
 
 prc_path = "./vds/prc"
