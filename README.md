@@ -43,7 +43,7 @@ Define se o processo será mostrado.
 - Valores aceitos: s (sim) ou n (não)
 - Valor padrão: n
 
-#### drawbb
+#### -drawbb
 Define se a bounding box será desenhada.
 
 - Valores aceitos: s (sim) ou n (não)
