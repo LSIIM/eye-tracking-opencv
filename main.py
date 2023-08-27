@@ -1,4 +1,5 @@
 
+import sys
 import os
 import cv2
 import numpy as np
@@ -15,7 +16,6 @@ from drawing_utils import *
 from Face import Face
 
 global_options = {
-    'save_video': None,
     'show_process': None,
     'draw_bb': None,
     'draw_iris': None,
@@ -25,7 +25,8 @@ global_options = {
     'show_warnings': None,
     'use_multicore': None,
     'overwrite': None,
-    'show_gaze': None
+    'draw_gaze': None,
+    'path': None
 }
 
 def getVideoProperties(path):
@@ -43,11 +44,11 @@ def handle_directory(path):
     # print(name)
     if (name == "auxiliary"):
         return
-    nprc_path = './vds/prc'+path.split("raw")[1].split(".")[0]
+    nprc_path = global_options['path'] + '/processed'
     try:
         os.mkdir(nprc_path)
     except:
-        if (show_warnings == 's'):
+        if (global_options['show_warnings']):
             print("Diretorio ja existe")
         if (not global_options['overwrite']):
             return None, None
@@ -109,7 +110,7 @@ def process_video(path):
                         frame, positions_data, 100)
                 if (global_options['draw_mask_points']):
                     frame = draw_face_mesh_points(image=frame, lms=face_info.lms_2d)
-                if (global_options['show_gaze']):
+                if (global_options['draw_gaze']):
                     frame = draw_gaze(frame, face_info.gaze_vector, face_info.nose_2d)
 
             if (global_options['show_process']):
@@ -128,60 +129,56 @@ def process_video(path):
 
 
 def find_videos():
-    for root, dirs, files in os.walk('./vds/raw'):
-        nprc_path = './vds/prc'+root.split("raw")[1]
-        try:
-            os.mkdir(nprc_path)
-        except:
-            None
+    for root, dirs, files in os.walk(global_options['path']):
+        
         for file in files:
-            if (file.split(".")[1] == "avi" or file.split(".")[1] == "mp4"):
+            if ((file.split(".")[1] == "avi" or file.split(".")[1] == "mp4") and (file.split(".")[0] == "record")):
                 process_video(root + '/' + file)
 
 
+def find_argument_by_option(option, arguments, default):
+    for i in range(0, len(arguments)):
+        if (arguments[i] == option):
+            ans = arguments[i+1]
+            # check if is valid
+            if (ans == 's' or ans == 'n'):
+                return ans == 's'
+            else:
+                print(f'Argumento {ans} invalido para a opção {option}. Abortando...')
+                exit()
+    return default == 's'
+
+def get_path_argument(arguments, default):
+    for i in range(0, len(arguments)):
+        if (arguments[i] == '-path'):
+            return arguments[i+1]
+    return default
+
 if __name__ == "__main__":
 
+    # as options serão passadas por argumentos
+    arguments = sys.argv[1:]
 
-    print("As respostas a seguir serão usadas em todos os videos do processamento em lote!")
-
-
-
-
-    show_process = str(input("(Isso pode implicar em perda de performance) Deseja mostrar o processo frame a frame? s/n ")).lower()
-    global_options['show_process'] = show_process == 's'
+    global_options['show_process'] = find_argument_by_option(option = '-showprocess', arguments = arguments, default = 'n')
+    global_options['draw_bb'] = find_argument_by_option(option = '-drawbb', arguments = arguments, default = 'n')
+    global_options['draw_iris'] = find_argument_by_option(option = '-drawir', arguments = arguments, default = 'n')
+    global_options['draw_pupil'] = find_argument_by_option(option = '-drawpu', arguments = arguments, default = 'n')
+    global_options['draw_past_pos'] = find_argument_by_option(option = '-drawpp', arguments = arguments, default = 's')
+    global_options['draw_mask_points'] = find_argument_by_option(option = '-drawmp', arguments = arguments, default = 'n')
+    global_options['draw_gaze'] = find_argument_by_option(option = '-drawgz', arguments = arguments, default = 'n')
+    global_options['show_warnings'] = find_argument_by_option(option = '-showwarn', arguments = arguments, default = 's')
+    global_options['use_multicore'] = find_argument_by_option(option = '-multicore', arguments = arguments, default = 'n')
     
-    draw_bb = str(input("Deseja desenhar uma borda ao redor do rosto? s/n ")).lower()
-    global_options['draw_bb'] = draw_bb == 's'
+    if (global_options['use_multicore']):
+        global_options['overwrite'] = find_argument_by_option(option = '-overwrite', arguments = arguments, default='s')
+    else:
+        global_options['overwrite'] = find_argument_by_option(option = '-overwrite', arguments = arguments, default='n')
 
-    draw_iris = str(input("Deseja desenhar os circulos da iris? s/n ")).lower()
-    global_options['draw_iris'] = draw_iris == 's'
-    
-    draw_pupil = str(input("Deseja desenhar os circulos das pupilas? s/n ")).lower()
-    global_options['draw_pupil'] = draw_pupil == 's'
-    
-    draw_past_pos = str(input("Deseja desenhar a linha com o rastreio das posições passadas? s/n ")).lower()
-    global_options['draw_past_pos'] = draw_past_pos == 's'
-    
-    draw_mask_points = str(input("Deseja desenhar os pontos da mascara no rosto? s/n ")).lower()
-    global_options['draw_mask_points'] = draw_mask_points == 's'
-
-    show_gaze = str(input("Deseja mostrar o ponto de foco do olhar? s/n ")).lower()
-    global_options['show_gaze'] = show_gaze == 's'
-    
-    show_warnings = str(input("Deseja que o mostre os avisos? s/n ")).lower() 
-    global_options['show_warnings'] = show_warnings == 's'
-
-
-    use_multicore = str(input("Deseja executar o programa em multicore? s/n ")).lower()
-    global_options['use_multicore'] = use_multicore == 's'
+    global_options['path'] = get_path_argument(arguments, default = './vds')
     
     if (not global_options['use_multicore']) :
-        overwrite = str(input("Caso haja sobreposição dos processamentos, deseja sobrescrever o arquivo? s/n ")).lower()
-        global_options['overwrite'] = overwrite == 's'
         find_videos()
     else:
-        global_options['overwrite'] = False
-
         processes = []
         ncpu = int(os.cpu_count()/2)
         print(f'Inicializando processamento multicore com {ncpu} nucleos')
