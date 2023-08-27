@@ -102,5 +102,5 @@ Define o caminho para os arquivos.
 - Valor padrão: ""./vds"
 ##### Exemplo de Uso
 
-`python script_name.py -showprocess s -drawbb n -path "./meus_arquivos/"`
+`python main.py -showprocess s -drawbb n -path "./meus_arquivos"`
 >Nota: Se um argumento inválido for fornecido para uma opção, o script imprimirá uma mensagem de erro e encerrará sua execução.
