@@ -8,7 +8,6 @@ from eye_feature_detector_module import EyeModule
 from gaze_module import GazeEstimator
 from definitions import *
 
-
 class Face():
     def __init__(self, image, logging = False):
         self.image = image.copy()
