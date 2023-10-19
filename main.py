@@ -52,12 +52,13 @@ def handle_directory(path):
         print(f'original path: {original_path}\nbase new path: {path}\nname: {name}\n')
 
     if(global_options['path'].split('/')[-1] !=  original_path.split('/')[-2]):
-        print(original_path.split(name_with_ext))
-        print(original_path.split(global_options['path']))
+        # print(original_path.split(name_with_ext))
+        # print(original_path.split(global_options['path']))
         diff = original_path.split(name_with_ext)[0].split(global_options['path'])[1]
         nprc_path += diff[:-1]
 
-    print(f'new path: {nprc_path}\n')
+    if(global_options['show_warnings']):
+        print(f'new path: {nprc_path}\n')   
     try:
         # mkdir que cria pasta e subpastas se necessário
         os.makedirs(nprc_path)
@@ -79,7 +80,8 @@ def process_video(path):
         if(global_options['show_warnings']):
             print("Abortando processamento, pois o diretorio ja existe")
         return
-    print("\nProcessando: " + path)
+    if(global_options['show_warnings']):
+        print("\nProcessando: " + path)
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter(name, fourcc, vfps,
@@ -251,3 +253,7 @@ if __name__ == "__main__":
 
         for process in processes:
             process.join()
+
+    # move os arquivos de opções para a pasta processed
+    os.rename('options.txt', global_options['path'] + '/processed/options.txt')
+    os.rename('path.txt', global_options['path'] + '/processed/path.txt')
