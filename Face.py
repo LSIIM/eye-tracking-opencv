@@ -9,8 +9,8 @@ from gaze_module import GazeEstimator
 from definitions import *
 
 class Face():
-    def __init__(self, image, logging = False):
-        self.image = image.copy()
+    def __init__(self, logging = False):
+        self.image = None
         self._face_mesh_detector = FaceMeshDetector()
         self._gaze_estimator = None
         self._eye_module = None
@@ -41,7 +41,8 @@ class Face():
         }
     def init_eye_module(self):
         self._eye_module = EyeModule(self.image, self.lms_2d)
-    def detect_face(self):
+    def detect_face(self, image):
+        self.image = image
         self.lms_3d = self._face_mesh_detector.findFaceMesh(self.image)
         if self.lms_3d is None:
             if self.logging:

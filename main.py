@@ -39,8 +39,9 @@ def getVideoProperties(path):
 
 def handle_directory(path):
     original_path = path
-    name = path.split('/')
-    name = name[len(name)-1].split('.')
+    name_with_ext = path.split('/')
+    name = name_with_ext[len(name_with_ext)-1].split('.')
+    name_with_ext = name_with_ext[-1]
     name = name[0]
     # print(name)
     if (name == "auxiliary"):
@@ -48,12 +49,18 @@ def handle_directory(path):
     nprc_path = global_options['path'] + '/processed' 
 
     if(global_options['show_warnings']):
-        print(f'original path: {original_path}\npath: {path}\nname: {name}\n')
+        print(f'original path: {original_path}\nbase new path: {path}\nname: {name}\n')
 
     if(global_options['path'].split('/')[-1] !=  original_path.split('/')[-2]):
-        nprc_path += '/' + original_path.split('/')[-2]
+        print(original_path.split(name_with_ext))
+        print(original_path.split(global_options['path']))
+        diff = original_path.split(name_with_ext)[0].split(global_options['path'])[1]
+        nprc_path += diff[:-1]
+
+    print(f'new path: {nprc_path}\n')
     try:
-        os.mkdir(nprc_path)
+        # mkdir que cria pasta e subpastas se necessário
+        os.makedirs(nprc_path)
     except:
         if (global_options['show_warnings']):
             print("Diretorio ja existe")
@@ -62,7 +69,7 @@ def handle_directory(path):
     path = nprc_path + "/"
     name = nprc_path + '/video.avi'
     if (global_options['show_warnings']):
-        print(f'prc path: {path}\nprc name: {name}\n')
+        print(f'prc path: {path}\nprc name: {name}\n\n')
 
     return path, name
 def process_video(path):
@@ -79,15 +86,14 @@ def process_video(path):
                           (width, height))
 
     positions_data = PositionsModule()
+    
+    face_info = Face(logging = global_options['show_warnings'])
     for i in tqdm(range(0, vLength+1)):
         ret, frame = camera.read()
         frame_data = FaceDataModule(i, height, width)
         
         if ret:
-            
-            
-            face_info = Face(frame, logging = global_options['show_warnings'])
-            face_info.detect_face()
+            face_info.detect_face(frame)
             if(face_info.lms_3d is not None):
                 
                 face_info.init_eye_module()
@@ -133,9 +139,21 @@ def process_video(path):
     camera.release()
     cv2.destroyAllWindows()
     positions_data.save_data(path+"/positions.csv")
+    del positions_data
 
+def verify_globals():
+    # if it is running on multicore, the globals wont be shared, so we need to load it from the file
+    if (global_options['path'] is None):
+        print("Carregando opções do arquivo para o multicore")
+        with open('options.txt', 'r') as f:
+            for line in f:
+                line = line.split()
+                global_options[line[0]] = line[1] == 's'
+        with open('path.txt', 'r') as f:
+            global_options['path'] = f.readline()
 
 def find_videos():
+    verify_globals()
     for root, dirs, files in os.walk(global_options['path']): 
         root = root.replace('\\', '/')
         for file in files:
@@ -199,12 +217,26 @@ if __name__ == "__main__":
     global_options['use_multicore'] = find_argument_by_option(option = '-multicore', arguments = arguments, default = 'n')
     
     if (global_options['use_multicore']):
-        global_options['overwrite'] = find_argument_by_option(option = '-overwrite', arguments = arguments, default='s')
-    else:
         global_options['overwrite'] = find_argument_by_option(option = '-overwrite', arguments = arguments, default='n')
+    else:
+        global_options['overwrite'] = find_argument_by_option(option = '-overwrite', arguments = arguments, default='s')
 
     global_options['path'] = get_path_argument(arguments, default = './vds')
     
+    # save options on temp file
+    with open('options.txt', 'w') as f:
+        for key in global_options:
+            if key !='path':
+                f.write(f'{key} {"s" if global_options[key] else "n"}\n')
+    with open('path.txt', 'w') as f:
+        f.write(global_options['path'])
+
+    try:
+        os.mkdir(global_options['path'] + '/processed')
+    except:
+        if (global_options['show_warnings']):
+            print("Um processamento ja foi feito nessa pasta. Refazendo...")
+
     if (not global_options['use_multicore']) :
         find_videos()
     else:
