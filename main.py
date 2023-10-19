@@ -38,13 +38,20 @@ def getVideoProperties(path):
     return vfps, vLength, camera, height, width
 
 def handle_directory(path):
+    original_path = path
     name = path.split('/')
     name = name[len(name)-1].split('.')
     name = name[0]
     # print(name)
     if (name == "auxiliary"):
         return
-    nprc_path = global_options['path'] + '/processed'
+    nprc_path = global_options['path'] + '/processed' 
+
+    if(global_options['show_warnings']):
+        print(f'original path: {original_path}\npath: {path}\nname: {name}\n')
+
+    if(global_options['path'].split('/')[-1] !=  original_path.split('/')[-2]):
+        nprc_path += '/' + original_path.split('/')[-2]
     try:
         os.mkdir(nprc_path)
     except:
@@ -54,11 +61,11 @@ def handle_directory(path):
             return None, None
     path = nprc_path + "/"
     name = nprc_path + '/video.avi'
+    if (global_options['show_warnings']):
+        print(f'prc path: {path}\nprc name: {name}\n')
 
     return path, name
 def process_video(path):
-    
-
     vfps, vLength, camera, height, width = getVideoProperties(path)
     path, name = handle_directory(path)
     if(path is None):
@@ -129,10 +136,12 @@ def process_video(path):
 
 
 def find_videos():
-    for root, dirs, files in os.walk(global_options['path']):
-        
+    for root, dirs, files in os.walk(global_options['path']): 
+        root = root.replace('\\', '/')
         for file in files:
             if ((file.split(".")[1] == "avi" or file.split(".")[1] == "mp4") and (file.split(".")[0] == "record")):
+                if(global_options['show_warnings']):
+                    print(f'root: {root}\ndirs: {dirs}\nfile: {file}\n')
                 process_video(root + '/' + file)
 
 
@@ -151,13 +160,33 @@ def find_argument_by_option(option, arguments, default):
 def get_path_argument(arguments, default):
     for i in range(0, len(arguments)):
         if (arguments[i] == '-path'):
-            return arguments[i+1]
+            # troca \ por / para evitar problemas com o windows
+            return arguments[i+1].replace('\\', '/')
     return default
 
 if __name__ == "__main__":
 
     # as options serão passadas por argumentos
     arguments = sys.argv[1:]
+
+    # mostra os argumentos disponiveis e seus defauts e o que fazem (descrição breve)
+    if (len(arguments) == 0):
+        print('''
+        Argumentos disponiveis:
+        -showprocess s/n (default: n) -> mostra o video sendo processado    
+        -drawbb s/n (default: n) -> desenha o bounding box da face
+        -drawir s/n (default: n) -> desenha os circulos da iris
+        -drawpu s/n (default: n) -> desenha os circulos da pupila
+        -drawpp s/n (default: s) -> desenha as ultimas posicoes da pupila
+        -drawmp s/n (default: n) -> desenha os pontos da malha da face
+        -drawgz s/n (default: n) -> desenha o vetor de olhar
+        -showwarn s/n (default: s) -> mostra avisos
+        -multicore s/n (default: n) -> usa processamento multicore
+        -overwrite s/n (default: s) -> sobrescreve os arquivos ja processados
+        -path <path> (default: ./vds) -> caminho para a pasta com os videos
+              ''')
+        
+        exit()
 
     global_options['show_process'] = find_argument_by_option(option = '-showprocess', arguments = arguments, default = 'n')
     global_options['draw_bb'] = find_argument_by_option(option = '-drawbb', arguments = arguments, default = 'n')
