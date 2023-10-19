@@ -4,7 +4,7 @@ draw_iris s
 draw_pupil s
 draw_past_pos s
 draw_mask_points s
-show_warnings n
-use_multicore s
-overwrite n
+show_warnings s
+use_multicore n
+overwrite s
 draw_gaze s

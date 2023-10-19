@@ -90,11 +90,14 @@ def process_video(path):
     positions_data = PositionsModule()
     
     face_info = Face(logging = global_options['show_warnings'])
-    for i in tqdm(range(0, vLength+1)):
+    face_not_found_counter = 0
+    frame_not_found_counter = 0
+    for i in tqdm(range(0, vLength)):
         ret, frame = camera.read()
         frame_data = FaceDataModule(i, height, width)
         
         if ret:
+            original_frame = frame.copy()
             face_info.detect_face(frame)
             if(face_info.lms_3d is not None):
                 
@@ -127,21 +130,38 @@ def process_video(path):
                     frame = draw_face_mesh_points(image=frame, lms=face_info.lms_2d)
                 if (global_options['draw_gaze']):
                     frame = draw_gaze(frame, face_info.gaze_vector, face_info.nose_2d)
+            else:
+                face_not_found_counter += 1
 
+            # verifica se o frame é uma imagem valida
+            if (frame is None):
+                out.write(original_frame)
+            else:
+                out.write(frame)
             if (global_options['show_process']):
                 cv2.imshow('frame', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             #print("\nframe shape ",frame.shape)
+        else:
+            frame_not_found_counter += 1
+            if (global_options['show_warnings']):
+                print("Frame nao encontrado, salvando com uma imagem preta")
+            out.write(np.zeros((height, width, 3), np.uint8))
 
+        # independente de ter encontrado a face ou nao, salva os dados    
         positions_data.add_positions(frame_data)
-        out.write(frame)
+
+
+            
         
     out.release()
     camera.release()
     cv2.destroyAllWindows()
     positions_data.save_data(path+"/positions.csv")
-    
+    if (global_options['show_warnings']):
+        print(f'Frames com faces nao encontradas: {face_not_found_counter}')
+        print(f'Frames nao encontrados: {frame_not_found_counter}')
 
 def verify_globals():
     # if it is running on multicore, the globals wont be shared, so we need to load it from the file
