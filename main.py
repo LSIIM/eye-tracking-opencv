@@ -84,8 +84,8 @@ def process_video(path):
         print("\nProcessando: " + path)
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(name, fourcc, vfps,
-                          (width, height))
+    out = cv2.VideoWriter(filename=name, fourcc=fourcc, fps=vfps,
+                          frameSize=(width, height), isColor=True)
 
     positions_data = PositionsModule()
     
@@ -141,7 +141,7 @@ def process_video(path):
     camera.release()
     cv2.destroyAllWindows()
     positions_data.save_data(path+"/positions.csv")
-    del positions_data
+    
 
 def verify_globals():
     # if it is running on multicore, the globals wont be shared, so we need to load it from the file
@@ -225,7 +225,14 @@ if __name__ == "__main__":
 
     global_options['path'] = get_path_argument(arguments, default = './vds')
     
-    # save options on temp file
+
+    try:
+        os.mkdir(global_options['path'] + '/processed')
+    except:
+        if (global_options['show_warnings']):
+            print("Um processamento ja foi feito nessa pasta. Refazendo...")
+    
+     # save options on temp file
     with open('options.txt', 'w') as f:
         for key in global_options:
             if key !='path':
@@ -233,11 +240,13 @@ if __name__ == "__main__":
     with open('path.txt', 'w') as f:
         f.write(global_options['path'])
 
-    try:
-        os.mkdir(global_options['path'] + '/processed')
-    except:
-        if (global_options['show_warnings']):
-            print("Um processamento ja foi feito nessa pasta. Refazendo...")
+    # escreve uma copia em processed
+    with open(global_options['path'] + '/processed/options.txt', 'w') as f:
+        for key in global_options:
+            if key !='path':
+                f.write(f'{key} {"s" if global_options[key] else "n"}\n')
+    with open(global_options['path'] + '/processed/path.txt', 'w') as f:
+        f.write(global_options['path'])
 
     if (not global_options['use_multicore']) :
         find_videos()
@@ -254,6 +263,4 @@ if __name__ == "__main__":
         for process in processes:
             process.join()
 
-    # move os arquivos de opções para a pasta processed
-    os.rename('options.txt', global_options['path'] + '/processed/options.txt')
-    os.rename('path.txt', global_options['path'] + '/processed/path.txt')
+    
