@@ -56,6 +56,12 @@ class PositionsModule():
             'head_orientation_x': [ data._head_orientation['x'] if data._head_orientation is not None else "" for data in self._data],
             'head_orientation_y': [ data._head_orientation['y'] if data._head_orientation is not None else "" for data in self._data],
             'head_orientation_z': [ data._head_orientation['z'] if data._head_orientation is not None else "" for data in self._data],
+
+            'left_eye_gaze_x': [ data._left_eye_gaze['x'] if data._left_eye_gaze is not None else "" for data in self._data],
+            'left_eye_gaze_y': [ data._left_eye_gaze['y'] if data._left_eye_gaze is not None else "" for data in self._data],
+
+            'right_eye_gaze_x': [ data._right_eye_gaze['x'] if data._right_eye_gaze is not None else "" for data in self._data],
+            'right_eye_gaze_y': [ data._right_eye_gaze['y'] if data._right_eye_gaze is not None else "" for data in self._data],
         }
 
        
@@ -70,6 +76,8 @@ class FaceDataModule():
         self._left_pupil = None
         self._right_pupil = None
         self._head_orientation = None
+        self._left_eye_gaze = None
+        self._right_eye_gaze = None
         self._frame = frame
         self._height = height
         self._width = width
@@ -98,6 +106,29 @@ class FaceDataModule():
                 "x": None,
                 "y": None,
                 "z": None
+            }
+    
+    def add_eyes_gaze_data(self, left_gaze, right_gaze):
+        if (left_gaze is not None):
+            self._left_eye_gaze = {
+                "x": left_gaze[0],
+                "y": left_gaze[1]
+            }
+        else:
+            self._left_eye_gaze = {
+                "x": None,
+                "y": None
+            }
+        
+        if (right_gaze is not None):
+            self._right_eye_gaze = {
+                "x": right_gaze[0],
+                "y": right_gaze[1]
+            }
+        else:
+            self._right_eye_gaze = {
+                "x": None,
+                "y": None
             }
 
     def add_position_data(self, data, key):
