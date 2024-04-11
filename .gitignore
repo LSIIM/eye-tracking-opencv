@@ -3,3 +3,4 @@ build/*
 dst/mediapippe/*
 mediapipe/*
 dst/vds/*
+Pipefile.lock

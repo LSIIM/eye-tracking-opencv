@@ -34,8 +34,8 @@ class Face():
         self.head_orientation_vector = head_orientation_vector
     
     def detect_eyes_gaze(self):
-        self._eye_gaze_estimator = EyeGazeEstimator(self.lms_3d, self.image.shape)
-        left_eye_gaze, right_eye_gaze = self._eye_gaze_estimator.get_eye_gaze()
+        self._eye_gaze_estimator = EyeGazeEstimator(self.image.shape)
+        self.left_eye_gaze, self.right_eye_gaze = self._eye_gaze_estimator.get_eye_gaze_vector(self.lms_3d)
 
 
     def get_position_data_as_dict(self):

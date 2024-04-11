@@ -26,6 +26,7 @@ global_options = {
     'use_multicore': None,
     'overwrite': None,
     'draw_head_orientation': None,
+    'draw_eye_gaze': None,
     'path': None
 }
 
@@ -131,6 +132,8 @@ def process_video(path):
                     frame = draw_face_mesh_points(image=frame, lms=face_info.lms_2d)
                 if (global_options['draw_head_orientation']):
                     frame = draw_head_orientation(frame, face_info.head_orientation_vector, face_info.nose_2d)
+                if(global_options['draw_eye_gaze']):
+                    frame = draw_eye_gaze(frame, face_info.left_pupil, face_info.left_eye_gaze, face_info.right_pupil, face_info.right_eye_gaze)
             else:
                 face_not_found_counter += 1
 
@@ -220,7 +223,8 @@ if __name__ == "__main__":
         -drawpu s/n (default: n) -> desenha os circulos da pupila
         -drawpp s/n (default: s) -> desenha as ultimas posicoes da pupila
         -drawmp s/n (default: n) -> desenha os pontos da malha da face
-        -drawgz s/n (default: n) -> desenha o vetor de olhar
+        -drawheadpose s/n (default: n) -> desenha o vetor da posição da orientação da cabeça
+        -draweyegaze s/n (default: n) -> desenha o vetor do olhar
         -showwarn s/n (default: s) -> mostra avisos
         -multicore s/n (default: n) -> usa processamento multicore
         -overwrite s/n (default: s) -> sobrescreve os arquivos ja processados
@@ -235,9 +239,11 @@ if __name__ == "__main__":
     global_options['draw_pupil'] = find_argument_by_option(option = '-drawpu', arguments = arguments, default = 'n')
     global_options['draw_past_pos'] = find_argument_by_option(option = '-drawpp', arguments = arguments, default = 's')
     global_options['draw_mask_points'] = find_argument_by_option(option = '-drawmp', arguments = arguments, default = 'n')
-    global_options['draw_head_orientation'] = find_argument_by_option(option = '-drawgz', arguments = arguments, default = 'n')
+    global_options['draw_head_orientation'] = find_argument_by_option(option = '-drawheadpose', arguments = arguments, default = 'n')
+    global_options['draw_eye_gaze'] = find_argument_by_option(option = '-draweyegaze', arguments = arguments, default = 'n')
     global_options['show_warnings'] = find_argument_by_option(option = '-showwarn', arguments = arguments, default = 's')
     global_options['use_multicore'] = find_argument_by_option(option = '-multicore', arguments = arguments, default = 'n')
+    
     
     if (global_options['use_multicore']):
         global_options['overwrite'] = find_argument_by_option(option = '-overwrite', arguments = arguments, default='n')

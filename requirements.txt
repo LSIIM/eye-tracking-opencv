@@ -1,0 +1,6 @@
+opencv-python==*
+numpy
+mediapipe
+tqdm
+scipy
+pandas

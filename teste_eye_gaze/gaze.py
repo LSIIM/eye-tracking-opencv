@@ -66,8 +66,7 @@ def gaze(frame, points):
     )
 
     dist_coeffs = np.zeros((4, 1))  # Assuming no lens distortion
-    (success, rotation_vector, translation_vector) = cv2.solvePnP(model_points, image_points, camera_matrix,
-                                                                  dist_coeffs, flags=cv2.SOLVEPNP_ITERATIVE)
+    (success, rotation_vector, translation_vector) = cv2.solvePnP(model_points, image_points, camera_matrix, dist_coeffs, flags=cv2.SOLVEPNP_ITERATIVE)
 
     # 2d pupil location
     left_pupil = relative(points.landmark[468], frame.shape)
@@ -84,8 +83,7 @@ def gaze(frame, points):
         S = Eye_ball_center_left + (pupil_world_cord - Eye_ball_center_left) * 10
 
         # Project a 3D gaze direction onto the image plane.
-        (eye_pupil2D, _) = cv2.projectPoints((int(S[0]), int(S[1]), int(S[2])), rotation_vector,
-                                             translation_vector, camera_matrix, dist_coeffs)
+        (eye_pupil2D, _) = cv2.projectPoints((int(S[0]), int(S[1]), int(S[2])), rotation_vector, translation_vector, camera_matrix, dist_coeffs)
         # project 3D head pose into the image plane
         (head_pose, _) = cv2.projectPoints((int(pupil_world_cord[0]), int(pupil_world_cord[1]), int(40)),
                                            rotation_vector,
