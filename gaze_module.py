@@ -3,7 +3,7 @@ import mediapipe as mp
 import numpy as np
 import time
 
-class GazeEstimator():
+class HeadOrientationEstimator():
     def __init__(self, lms_3d, img_h, img_w):
         self.face_3d = []
         self.face_2d = []
@@ -11,7 +11,7 @@ class GazeEstimator():
         self.img_h = img_h
         self.img_w = img_w
     
-    def get_gaze_vector(self):
+    def get_head_orientation_vector(self):
         for idx, lm in enumerate(self.lms_3d):
             if idx == 33 or idx == 263 or idx == 1 or idx == 61 or idx == 291 or idx == 199:
                 if idx == 1:

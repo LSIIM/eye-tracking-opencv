@@ -5,14 +5,14 @@ import numpy as np
 
 from face_mesh_module import FaceMeshDetector
 from eye_feature_detector_module import EyeModule
-from gaze_module import GazeEstimator
+from gaze_module import HeadOrientationEstimator
 from definitions import *
 
 class Face():
     def __init__(self, logging = False):
         self.image = None
         self._face_mesh_detector = FaceMeshDetector()
-        self._gaze_estimator = None
+        self._head_orientation_estimator = None
         self._eye_module = None
         self.logging = logging
         self.lms_3d = None
@@ -23,13 +23,13 @@ class Face():
         self.right_pupil = None
         self.face_border = None
         self.nose_2d = None
-        self.gaze_vector = None
+        self.head_orientation_vector = None
 
-    def detect_gaze(self):
-        self._gaze_estimator = GazeEstimator( self.lms_3d, self.image.shape[0], self.image.shape[1])
-        gaze_vector, nose_2d = self._gaze_estimator.get_gaze_vector()
+    def detect_head_orientation(self):
+        self._head_orientation_estimator = HeadOrientationEstimator( self.lms_3d, self.image.shape[0], self.image.shape[1])
+        head_orientation_vector, nose_2d = self._head_orientation_estimator.get_head_orientation_vector()
         self.nose_2d = nose_2d
-        self.gaze_vector = gaze_vector
+        self.head_orientation_vector = head_orientation_vector
 
     def get_position_data_as_dict(self):
         return {

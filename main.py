@@ -25,7 +25,7 @@ global_options = {
     'show_warnings': None,
     'use_multicore': None,
     'overwrite': None,
-    'draw_gaze': None,
+    'draw_head_orientation': None,
     'path': None
 }
 
@@ -105,7 +105,7 @@ def process_video(path):
                 face_info.detect_iris()
                 face_info.detect_pupil()
 
-                face_info.detect_gaze()
+                face_info.detect_head_orientation()
 
                 # salva os dados da face
                 face_data_dict = face_info.get_position_data_as_dict()
@@ -113,7 +113,7 @@ def process_video(path):
                 for key in face_data_dict:
                     frame_data.add_position_data(face_data_dict[key],key)
                 
-                frame_data.add_gaze_data(face_info.gaze_vector)
+                frame_data.add_head_orientation_data(face_info.head_orientation_vector)
 
                 # desenha os dados da face
                 if (global_options['draw_bb']):
@@ -128,8 +128,8 @@ def process_video(path):
                         frame, positions_data, 100)
                 if (global_options['draw_mask_points']):
                     frame = draw_face_mesh_points(image=frame, lms=face_info.lms_2d)
-                if (global_options['draw_gaze']):
-                    frame = draw_gaze(frame, face_info.gaze_vector, face_info.nose_2d)
+                if (global_options['draw_head_orientation']):
+                    frame = draw_head_orientation(frame, face_info.head_orientation_vector, face_info.nose_2d)
             else:
                 face_not_found_counter += 1
 
@@ -234,7 +234,7 @@ if __name__ == "__main__":
     global_options['draw_pupil'] = find_argument_by_option(option = '-drawpu', arguments = arguments, default = 'n')
     global_options['draw_past_pos'] = find_argument_by_option(option = '-drawpp', arguments = arguments, default = 's')
     global_options['draw_mask_points'] = find_argument_by_option(option = '-drawmp', arguments = arguments, default = 'n')
-    global_options['draw_gaze'] = find_argument_by_option(option = '-drawgz', arguments = arguments, default = 'n')
+    global_options['draw_head_orientation'] = find_argument_by_option(option = '-drawgz', arguments = arguments, default = 'n')
     global_options['show_warnings'] = find_argument_by_option(option = '-showwarn', arguments = arguments, default = 's')
     global_options['use_multicore'] = find_argument_by_option(option = '-multicore', arguments = arguments, default = 'n')
     

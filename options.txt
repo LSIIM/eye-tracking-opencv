@@ -7,4 +7,4 @@ draw_mask_points s
 show_warnings s
 use_multicore n
 overwrite s
-draw_gaze s
+draw_head_orientation s

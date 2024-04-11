@@ -5,8 +5,8 @@ import pandas as pd
 
 from definitions import *
 
-def draw_gaze(image, gaze_vector, nose_2d):
-    x,y,z = gaze_vector
+def draw_head_orientation(image, head_orientation_vector, nose_2d):
+    x,y,z = head_orientation_vector
     p1 = (int(nose_2d[0]), int(nose_2d[1]))
     p2 = (int(nose_2d[0] + y*10), int(nose_2d[1] - x*10))
 
