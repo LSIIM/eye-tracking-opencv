@@ -106,6 +106,7 @@ def process_video(path):
                 face_info.detect_pupil()
 
                 face_info.detect_head_orientation()
+                face_info.detect_eyes_gaze()
 
                 # salva os dados da face
                 face_data_dict = face_info.get_position_data_as_dict()
