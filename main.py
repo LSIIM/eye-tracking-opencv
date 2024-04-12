@@ -117,6 +117,7 @@ def process_video(path):
                 
                 frame_data.add_head_orientation_data(face_info.head_orientation_vector)
                 frame_data.add_eyes_gaze_data(face_info.left_eye_gaze, face_info.right_eye_gaze)
+                frame_data.add_nose_tip_data(face_info.nose_2d)
 
                 # desenha os dados da face
                 if (global_options['draw_bb']):

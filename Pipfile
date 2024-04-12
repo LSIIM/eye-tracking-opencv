@@ -10,6 +10,8 @@ mediapipe = "*"
 tqdm = "*"
 scipy = "*"
 pandas = "*"
+plotly = "*"
+kaleido = "==0.1.0post1"
 
 [dev-packages]
 pyinstaller = "*"
