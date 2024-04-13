@@ -117,6 +117,31 @@ def get_angles_between_vectors(v1, v2):
     angle = np.where(angle > 90, -(180 - angle), angle)
     return angle
 
+def draw_eye_gaze_visualizations(eye, data, save_path):
+    # create a line plot for the iris and pupil position through time
+
+    if(verbose):
+        print("Generating eye fixation visualization")
+        print("Saving in:", save_path)
+        print("Data columns:", data_df.columns)
+        print(data_df.head())
+
+    # create plot for {eye}_eye
+
+    fig_ocular_angle = px.line(data, x='frame', y=[f'{eye}_ocular_degree'], title=f'{eye} eye ocular movement range')
+    fig_ocular_angle.write_image(f"{save_path}/{eye}_eye_ocular_movement_range.png", width=1000, height=500, format='png', engine='kaleido')
+
+    fig_vertical_angle = px.line(data, x='frame', y=[f'vertical_angle_{eye}_degree'], title=f'{eye} eye vertical ocular movement range')
+    fig_vertical_angle.write_image(f"{save_path}/{eye}_eye_vertical_ocular_movement_range.png", width=1000, height=500, format='png', engine='kaleido')
+
+    fig_horizontal_angle = px.line(data, x='frame', y=[f'horizontal_angle_{eye}_degree'], title=f'{eye} eye horizontal ocular movement range')
+    fig_horizontal_angle.write_image(f"{save_path}/{eye}_eye_horizontal_ocular_movement_range.png", width=1000, height=500, format='png', engine='kaleido')
+
+    
+
+
+    
+
 def generate_ocular_movement_range_vizualization(data, save_path="visualizations"):
     # create a line plot for the angle between the head orientation and the eye gaze through time
 
@@ -171,8 +196,8 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
     
 
 
-    filled_data['angle_left_degree'] = get_angles_between_vectors(left_eye_gaze, head_orientation)
-    filled_data['angle_right_degree'] = get_angles_between_vectors(right_eye_gaze, head_orientation)
+    filled_data['left_ocular_degree'] = get_angles_between_vectors(left_eye_gaze, head_orientation)
+    filled_data['right_ocular_degree'] = get_angles_between_vectors(right_eye_gaze, head_orientation)
 
    
 
@@ -191,8 +216,8 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
 
 
     # remove outliers and smooth data
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'angle_left_degree', outlier_top_threshold=0.01, window_size=10)
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'angle_right_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'left_ocular_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'right_ocular_degree', outlier_top_threshold=0.01, window_size=10)
 
     filled_data = remove_outliers_and_smooth_data(filled_data, 'vertical_angle_left_degree', outlier_top_threshold=0.01, window_size=10)
     filled_data = remove_outliers_and_smooth_data(filled_data, 'vertical_angle_right_degree', outlier_top_threshold=0.01, window_size=10)
@@ -202,37 +227,8 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
   
 
 
-     # Plotting the data
-    fig = px.line(filled_data, x='frame', y=['angle_left_degree'], title='Ocular Movement Range')
-    if verbose:
-        print("Plot created")
-    # Save the plot as an image
-    fig.write_image(f"{save_path}/ocular_movement_range.png", width=1000, height=500, format='png', engine='kaleido')
-    if verbose:
-        print("Plot saved")
-
-    # a 2d line plot with the vertical and horizontal components of the vectors (head orientation and eye gaze) through in a arbitrary time
-    #only draw left eye (one image for horizontal and one for vertical)
-    fig = px.line(filled_data, x='frame', y=['vertical_angle_left_degree'], title='Vertical ocular movement range')
-    fig.write_image(f"{save_path}/vertical_ocular_movement_range_left_eye.png", width=1000, height=500, format='png', engine='kaleido')
-
-    fig = px.line(filled_data, x='frame', y=['horizontal_angle_left_degree'], title='Horizontal ocular movement range')
-    fig.write_image(f"{save_path}/horizontal_ocular_movement_range_left_eye.png", width=1000, height=500, format='png', engine='kaleido')
-
-
-
-
-    # a 3d line plot with the vectors (head orientation and eye gaze) through in a arbitrary time
-    # there will be 2 lines drawn, staring from 0,0,0 to the head orientation and eye gaze vectors
-    # the plot will be saved as html
-    fig = px.line_3d(filled_data, title='Head orientation vector')
-    fig.add_scatter3d(x=[0, filled_data['left_eye_gaze_x'][0]], y=[0, filled_data['left_eye_gaze_y'][0]], z=[0, filled_data['left_eye_gaze_z'][0]], mode='lines', name='Left eye gaze vector')
-    fig.add_scatter3d(x=[0, filled_data['head_orientation_x'][0]], y=[0, filled_data['head_orientation_y'][0]], z=[0, filled_data['head_orientation_z'][0]], mode='lines', name='Head orientation vector')
-
-    fig.write_html(f"{save_path}/head_orientation_and_eye_gaze.html")
-    if verbose:
-        print("3d plot saved")
-        print(f'The angle between the head orientation and the left eye gaze is {angle_left[0]} degrees')
+    # Plotting the data
+    draw_eye_gaze_visualizations('left', filled_data, save_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate visualizations for eye tracking data')
