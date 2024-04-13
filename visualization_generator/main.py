@@ -89,7 +89,17 @@ def generate_eye_fixation_visualization(data_df, save_path="visualizations"):
     # save the data with the left pupil position
     filled_data.to_csv(f"{save_path}/left_pupil_position.csv", index=False)
 
+def remove_outliers_and_smooth_data(data, column_name, outlier_top_threshold=0.01, window_size=10):
+    # remove outliers and smooth data
+    # outliers in this context are the top N% of the data
+    # the remotion will be done nullifying the values and then using the ffill method to fill the null values
+    data.loc[data[column_name] > data[column_name].quantile(1 - outlier_top_threshold), column_name] = None
+    data = data.ffill()
 
+    # smooth the data using a rolling mean
+    data[column_name] = data[column_name].rolling(window_size).mean()
+
+    return data
 
 def generate_ocular_movement_range_vizualization(data, save_path="visualizations"):
     # create a line plot for the angle between the head orientation and the eye gaze through time
@@ -189,38 +199,15 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
 
 
     # remove outliers and smooth data
-    # outliers in this context are the top N% of the data
-    outlier_top_threshold = 0.01
-    # the remotion will be done nullifying the values and then using the ffill method to fill the null values
-    filled_data.loc[filled_data['angle_left_degree'] > filled_data['angle_left_degree'].quantile(1 - outlier_top_threshold), 'angle_left_degree'] = None
-    filled_data.loc[filled_data['angle_right_degree'] > filled_data['angle_right_degree'].quantile(1 - outlier_top_threshold), 'angle_right_degree'] = None
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'angle_left_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'angle_right_degree', outlier_top_threshold=0.01, window_size=10)
 
-    filled_data.loc[filled_data['vertical_angle_left_degree'] > filled_data['vertical_angle_left_degree'].quantile(1 - outlier_top_threshold), 'vertical_angle_left_degree'] = None
-    filled_data.loc[filled_data['vertical_angle_right_degree'] > filled_data['vertical_angle_right_degree'].quantile(1 - outlier_top_threshold), 'vertical_angle_right_degree'] = None
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'vertical_angle_left_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'vertical_angle_right_degree', outlier_top_threshold=0.01, window_size=10)
 
-    filled_data.loc[filled_data['horizontal_angle_left_degree'] > filled_data['horizontal_angle_left_degree'].quantile(1 - outlier_top_threshold), 'horizontal_angle_left_degree'] = None
-    filled_data.loc[filled_data['horizontal_angle_right_degree'] > filled_data['horizontal_angle_right_degree'].quantile(1 - outlier_top_threshold), 'horizontal_angle_right_degree'] = None
-
-    filled_data = filled_data.ffill()
-
-    # save the data with the outliers removed
-    filled_data.to_csv(f"{save_path}/angles_no_outliers.csv", index=False)
-
-    # smooth the data using a rolling mean
-    filled_data['angle_left_degree'] = filled_data['angle_left_degree'].rolling(10).mean()
-    filled_data['angle_right_degree'] = filled_data['angle_right_degree'].rolling(10).mean()
-
-    filled_data['vertical_angle_left_degree'] = filled_data['vertical_angle_left_degree'].rolling(10).mean()
-    filled_data['vertical_angle_right_degree'] = filled_data['vertical_angle_right_degree'].rolling(10).mean()
-
-    filled_data['horizontal_angle_left_degree'] = filled_data['horizontal_angle_left_degree'].rolling(10).mean()
-    filled_data['horizontal_angle_right_degree'] = filled_data['horizontal_angle_right_degree'].rolling(10).mean()
-
-    # save the data with the smoothed values
-    filled_data.to_csv(f"{save_path}/angles_smoothed.csv", index=False)
-
-
-    
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'horizontal_angle_left_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, 'horizontal_angle_right_degree', outlier_top_threshold=0.01, window_size=10)
+  
 
 
      # Plotting the data

@@ -1,0 +1,11 @@
+show_process s
+draw_bb n
+draw_iris n
+draw_pupil n
+draw_past_pos n
+draw_mask_points n
+show_warnings s
+use_multicore n
+overwrite s
+draw_head_orientation s
+draw_eye_gaze s
