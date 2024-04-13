@@ -48,6 +48,35 @@ import numpy as np
 
 verbose = False
 
+def draw_fixation_visualization(data_df, eye, save_path):
+    fig = px.line(data_df, x='frame', y=[f'{eye}_pupil_x', f'{eye}_pupil_y'], title=f'{eye} eye fixation')
+    fig.write_image(f"{save_path}/{eye}_eye_fixation.png", width=1000, height=500, format='png', engine='kaleido')
+
+    if verbose:
+        print(f"{eye} eye fixation plot saved")
+
+
+def process_eye_fixation_data(data, eye, save_path):
+    filled_data = data.ffill()
+    if verbose:
+        print(f'{eye} data filled')
+
+    # Adjust gaze vectors based on pupil positions
+    filled_data[f'{eye}_pupil_x'] -= filled_data[f'nose_tip_x']
+    filled_data[f'{eye}_pupil_y'] -= filled_data[f'nose_tip_y']
+
+    # move the data so the mean is 0
+    filled_data[f'{eye}_pupil_x'] -= filled_data[f'{eye}_pupil_x'].mean()
+    filled_data[f'{eye}_pupil_y'] -= filled_data[f'{eye}_pupil_y'].mean()
+
+    # remove outliers and smooth data
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_pupil_x', outlier_top_threshold=0.001, window_size=3)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_pupil_y', outlier_top_threshold=0.001, window_size=3)
+
+    filled_data.to_csv(f"{save_path}/{eye}_pupil_position.csv", index=False)
+
+    draw_fixation_visualization(filled_data, eye, save_path)
+
 def generate_eye_fixation_visualization(data_df, save_path="visualizations"):
     # create a line plot for the iris and pupil position through time
 
@@ -62,32 +91,8 @@ def generate_eye_fixation_visualization(data_df, save_path="visualizations"):
 
     if(verbose):
         print("Data for the plot filtered")
-    # first remove the lines with no data (it will assume the value of the last known value)
-    filled_data = pupil_data.ffill()
-    if(verbose):
-        print("data filled")
-        print(filled_data.head())
-
-    # remove the head movement from the pupil position using the nose tip as a reference
-    filled_data['left_pupil_x'] = filled_data['left_pupil_x'] - filled_data['nose_tip_x']
-    filled_data['left_pupil_y'] = filled_data['left_pupil_y'] - filled_data['nose_tip_y']
-
-    # moves the data so the mean is 0
-    filled_data['left_pupil_x'] = filled_data['left_pupil_x'] - filled_data['left_pupil_x'].mean()
-    filled_data['left_pupil_y'] = filled_data['left_pupil_y'] - filled_data['left_pupil_y'].mean()
-
-    
-
-    fig = px.line(filled_data, x='frame', y=['left_pupil_x', 'left_pupil_y'], title='Left eye fixation')
-    if(verbose):
-        print("plot created")
-    # saves as 1000x1000 image
-    fig.write_image(f"{save_path}/left_eye_fixation.png", width=1000, height=500 , format='png',engine='kaleido')
-    if(verbose):
-        print("plot saved")
-
-    # save the data with the left pupil position
-    filled_data.to_csv(f"{save_path}/left_pupil_position.csv", index=False)
+    process_eye_fixation_data(pupil_data, 'left', save_path)
+    process_eye_fixation_data(pupil_data, 'right', save_path)
 
 def remove_outliers_and_smooth_data(data, column_name, outlier_top_threshold=0.01, window_size=10):
     # remove outliers and smooth data
