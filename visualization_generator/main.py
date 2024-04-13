@@ -137,10 +137,49 @@ def draw_eye_gaze_visualizations(eye, data, save_path):
     fig_horizontal_angle = px.line(data, x='frame', y=[f'horizontal_angle_{eye}_degree'], title=f'{eye} eye horizontal ocular movement range')
     fig_horizontal_angle.write_image(f"{save_path}/{eye}_eye_horizontal_ocular_movement_range.png", width=1000, height=500, format='png', engine='kaleido')
 
-    
+def process_eye_movement_range(data, eye, save_path):
+    filled_data = data.ffill()
+    if verbose:
+        print(f'{eye} data filled')
+
+    # Adjust gaze vectors based on pupil positions
+    filled_data[f'{eye}_eye_gaze_x'] -= filled_data[f'{eye}_pupil_x']
+    filled_data[f'{eye}_eye_gaze_y'] -= filled_data[f'{eye}_pupil_y']
+
+    # divide by 10
+    filled_data[f'{eye}_eye_gaze_x'] /= 10
+    filled_data[f'{eye}_eye_gaze_y'] /= 10
+
+    # Append the head orientation Z to gaze data to make 3D vectors
+    filled_data[f'{eye}_eye_gaze_z'] = filled_data['head_orientation_z']
+    filled_data[f'{eye}_eye_gaze_z'] = filled_data['head_orientation_z']
+
+    # Normalize the gaze and head orientation vectors
+    eye_gaze = filled_data[[f'{eye}_eye_gaze_x', f'{eye}_eye_gaze_y', f'{eye}_eye_gaze_z']].values
+    head_orientation = filled_data[['head_orientation_x', 'head_orientation_y', 'head_orientation_z']].values
+
+    eye_gaze /= np.linalg.norm(eye_gaze, axis=1)[:, np.newaxis]
+    head_orientation /= np.linalg.norm(head_orientation, axis=1)[:, np.newaxis]
+
+    # Calcula o ângulo entre a orientação da cabeça e a direção do olhar para cada frame, convertendo para graus
+    filled_data[f'{eye}_ocular_degree'] = get_angles_between_vectors(eye_gaze, head_orientation)
+
+    # agora pega somente a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
+    filled_data[f'vertical_angle_{eye}_degree'] = get_angles_between_vectors(eye_gaze[:, 1:], head_orientation[:, 1:]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
+
+    # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
+    filled_data[f'horizontal_angle_{eye}_degree'] = get_angles_between_vectors(eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
+
+    # remove outliers and smooth data
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_ocular_degree', outlier_top_threshold=0.01, window_size=10)
+
+    filled_data.to_csv(f"{save_path}/{eye}_angles.csv", index=False)
+
+    draw_eye_gaze_visualizations(eye, filled_data, save_path)
 
 
     
+
 
 def generate_ocular_movement_range_vizualization(data, save_path="visualizations"):
     # create a line plot for the angle between the head orientation and the eye gaze through time
@@ -158,77 +197,9 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
 
     if verbose:
         print("Data for the plot filtered")
-    # first remove the lines with no data (it will assume the value of the last known value)
-    filled_data = gaze_data.ffill()
-    if verbose:
-        print("Data filled")
-        print(filled_data.head())
-    
-    # Adjust gaze vectors based on pupil positions
-    filled_data['left_eye_gaze_x'] -= filled_data['left_pupil_x']
-    filled_data['left_eye_gaze_y'] -= filled_data['left_pupil_y']
-    filled_data['right_eye_gaze_x'] -= filled_data['right_pupil_x']
-    filled_data['right_eye_gaze_y'] -= filled_data['right_pupil_y']
-
-    # divide by 10
-    filled_data['left_eye_gaze_x'] /= 10
-    filled_data['left_eye_gaze_y'] /= 10
-    filled_data['right_eye_gaze_x'] /= 10
-    filled_data['right_eye_gaze_y'] /= 10
-
-    # Append the head orientation Z to gaze data to make 3D vectors
-    filled_data['left_eye_gaze_z'] = filled_data['head_orientation_z']
-    filled_data['right_eye_gaze_z'] = filled_data['head_orientation_z']
-
-    # Normalize the gaze and head orientation vectors
-    right_eye_gaze = filled_data[['right_eye_gaze_x', 'right_eye_gaze_y', 'right_eye_gaze_z']].values
-    left_eye_gaze = filled_data[['left_eye_gaze_x', 'left_eye_gaze_y', 'left_eye_gaze_z']].values
-    head_orientation = filled_data[['head_orientation_x', 'head_orientation_y', 'head_orientation_z']].values
-
-    # salva o df com os dados normalizados
-    filled_data.to_csv(f"{save_path}/normalized_vectors.csv", index=False)
-
-    right_eye_gaze /= np.linalg.norm(right_eye_gaze, axis=1)[:, np.newaxis]
-    left_eye_gaze /= np.linalg.norm(left_eye_gaze, axis=1)[:, np.newaxis]
-    head_orientation /= np.linalg.norm(head_orientation, axis=1)[:, np.newaxis]
-
-    # Calcula o ângulo entre a orientação da cabeça e a direção do olhar para cada frame, convertendo para graus
-    
-
-
-    filled_data['left_ocular_degree'] = get_angles_between_vectors(left_eye_gaze, head_orientation)
-    filled_data['right_ocular_degree'] = get_angles_between_vectors(right_eye_gaze, head_orientation)
-
    
-
-    # agora pega somente a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
-    filled_data['vertical_angle_left_degree'] = get_angles_between_vectors(left_eye_gaze[:, 1:], head_orientation[:, 1:]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
-    filled_data['vertical_angle_right_degree']  = get_angles_between_vectors(right_eye_gaze[:, 1:], head_orientation[:, 1:]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
-
-
-    # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
-    filled_data['horizontal_angle_left_degree'] = get_angles_between_vectors(left_eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
-    filled_data['horizontal_angle_right_degree'] = get_angles_between_vectors(right_eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
-    
-
-    # save the data with the angles
-    filled_data.to_csv(f"{save_path}/angles.csv", index=False)
-
-
-    # remove outliers and smooth data
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'left_ocular_degree', outlier_top_threshold=0.01, window_size=10)
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'right_ocular_degree', outlier_top_threshold=0.01, window_size=10)
-
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'vertical_angle_left_degree', outlier_top_threshold=0.01, window_size=10)
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'vertical_angle_right_degree', outlier_top_threshold=0.01, window_size=10)
-
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'horizontal_angle_left_degree', outlier_top_threshold=0.01, window_size=10)
-    filled_data = remove_outliers_and_smooth_data(filled_data, 'horizontal_angle_right_degree', outlier_top_threshold=0.01, window_size=10)
-  
-
-
-    # Plotting the data
-    draw_eye_gaze_visualizations('left', filled_data, save_path)
+    process_eye_movement_range(gaze_data, 'left', save_path)
+    process_eye_movement_range(gaze_data, 'right', save_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate visualizations for eye tracking data')
