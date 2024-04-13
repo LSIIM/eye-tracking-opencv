@@ -101,6 +101,22 @@ def remove_outliers_and_smooth_data(data, column_name, outlier_top_threshold=0.0
 
     return data
 
+def get_angles_between_vectors(v1, v2):
+    # get the angle between two vectors
+    # v1 and v2 are numpy arrays
+    # the angle is in degrees
+
+    # <u,v> = x1*x2 + y1*y2 + z1*z2
+    # |v| = sqrt(x2^2 + y2^2 + z2^2)
+    # <u,v> = cos(phi) * |u| * |v|
+    # cos(phi) = <u,v> / (|u| * |v|) = (x1*x2 + y1*y2 + z1*z2 )/ sqrt(x1^2 + y1^2 + z1^2) * sqrt(x2^2 + y2^2 + z2^2)
+    # phi = arccos((x1*x2 + y1*y2 + z1*z2 )/ sqrt(x1^2 + y1^2 + z1^2) * sqrt(x2^2 + y2^2 + z2^2))
+
+    angle = np.arccos(np.divide(np.sum(v1 * v2, axis=1), np.linalg.norm(v1, axis=1) * np.linalg.norm(v2, axis=1))) * 180 / np.pi
+    # if phi > 90, phi = -(180 - phi)
+    angle = np.where(angle > 90, -(180 - angle), angle)
+    return angle
+
 def generate_ocular_movement_range_vizualization(data, save_path="visualizations"):
     # create a line plot for the angle between the head orientation and the eye gaze through time
 
@@ -152,47 +168,23 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
     head_orientation /= np.linalg.norm(head_orientation, axis=1)[:, np.newaxis]
 
     # Calcula o ângulo entre a orientação da cabeça e a direção do olhar para cada frame, convertendo para graus
-    # <u,v> = x1*x2 + y1*y2 + z1*z2
-    # |v| = sqrt(x2^2 + y2^2 + z2^2)
-    # <u,v> = cos(phi) * |u| * |v|
-    # cos(phi) = <u,v> / (|u| * |v|) = (x1*x2 + y1*y2 + z1*z2 )/ sqrt(x1^2 + y1^2 + z1^2) * sqrt(x2^2 + y2^2 + z2^2)
-    # phi = arccos((x1*x2 + y1*y2 + z1*z2 )/ sqrt(x1^2 + y1^2 + z1^2) * sqrt(x2^2 + y2^2 + z2^2))
-    angle_left = np.arccos(np.divide(np.sum(left_eye_gaze * head_orientation, axis=1), np.linalg.norm(left_eye_gaze, axis=1) * np.linalg.norm(head_orientation, axis=1))) * 180 / np.pi
-    angle_right = np.arccos(np.divide(np.sum(right_eye_gaze * head_orientation, axis=1), np.linalg.norm(right_eye_gaze, axis=1) * np.linalg.norm(head_orientation, axis=1))) * 180 / np.pi
     
-    # if phi > 90, phi = 180 - phi
-    angle_left = np.where(angle_left > 90, 180 - angle_left, angle_left)
-    angle_right = np.where(angle_right > 90, 180 - angle_right, angle_right)
 
 
-    filled_data['angle_left_degree'] = angle_left
-    filled_data['angle_right_degree'] = angle_right
+    filled_data['angle_left_degree'] = get_angles_between_vectors(left_eye_gaze, head_orientation)
+    filled_data['angle_right_degree'] = get_angles_between_vectors(right_eye_gaze, head_orientation)
 
    
 
     # agora pega somente a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
-    vertical_angle_left = np.arccos(np.divide(np.sum(left_eye_gaze[:, [1, 2]] * head_orientation[:, [1, 2]], axis=1), np.linalg.norm(left_eye_gaze[:, [1, 2]], axis=1) * np.linalg.norm(head_orientation[:, [1, 2]], axis=1))) * 180 / np.pi
-    vertical_angle_right = np.arccos(np.divide(np.sum(right_eye_gaze[:, [1, 2]] * head_orientation[:, [1, 2]], axis=1), np.linalg.norm(right_eye_gaze[:, [1, 2]], axis=1) * np.linalg.norm(head_orientation[:, [1, 2]], axis=1))) * 180 / np.pi
-
-    # if phi > 90, phi = 180 - phi
-    vertical_angle_left = np.where(vertical_angle_left > 90, 180 - vertical_angle_left, vertical_angle_left)
-    vertical_angle_right = np.where(vertical_angle_right > 90, 180 - vertical_angle_right, vertical_angle_right)
+    filled_data['vertical_angle_left_degree'] = get_angles_between_vectors(left_eye_gaze[:, 1:], head_orientation[:, 1:]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
+    filled_data['vertical_angle_right_degree']  = get_angles_between_vectors(right_eye_gaze[:, 1:], head_orientation[:, 1:]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
 
 
     # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
-    horizontal_angle_left = np.arccos(np.divide(np.sum(left_eye_gaze[:, [0, 2]] * head_orientation[:, [0, 2]], axis=1), np.linalg.norm(left_eye_gaze[:, [0, 2]], axis=1) * np.linalg.norm(head_orientation[:, [0, 2]], axis=1))) * 180 / np.pi
-    horizontal_angle_right = np.arccos(np.divide(np.sum(right_eye_gaze[:, [0, 2]] * head_orientation[:, [0, 2]], axis=1), np.linalg.norm(right_eye_gaze[:, [0, 2]], axis=1) * np.linalg.norm(head_orientation[:, [0, 2]], axis=1))) * 180 / np.pi
-
-
-    # if phi > 90, phi = 180 - phi
-    horizontal_angle_left = np.where(horizontal_angle_left > 90, 180 - horizontal_angle_left, horizontal_angle_left)
-    horizontal_angle_right = np.where(horizontal_angle_right > 90, 180 - horizontal_angle_right, horizontal_angle_right)
-
-    filled_data['vertical_angle_left_degree'] = vertical_angle_left
-    filled_data['vertical_angle_right_degree'] = vertical_angle_right
-    filled_data['horizontal_angle_left_degree'] = horizontal_angle_left
-    filled_data['horizontal_angle_right_degree'] = horizontal_angle_right
-
+    filled_data['horizontal_angle_left_degree'] = get_angles_between_vectors(left_eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
+    filled_data['horizontal_angle_right_degree'] = get_angles_between_vectors(right_eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
+    
 
     # save the data with the angles
     filled_data.to_csv(f"{save_path}/angles.csv", index=False)
