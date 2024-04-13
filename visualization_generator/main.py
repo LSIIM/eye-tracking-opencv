@@ -166,17 +166,20 @@ def process_eye_movement_range(data, eye, save_path):
     eye_gaze /= np.linalg.norm(eye_gaze, axis=1)[:, np.newaxis]
     head_orientation /= np.linalg.norm(head_orientation, axis=1)[:, np.newaxis]
 
+
     # Calcula o ângulo entre a orientação da cabeça e a direção do olhar para cada frame, convertendo para graus
     filled_data[f'{eye}_ocular_degree'] = get_angles_between_vectors(eye_gaze, head_orientation)
 
     # agora pega somente a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
-    filled_data[f'vertical_angle_{eye}_degree'] = get_angles_between_vectors(eye_gaze[:, 1:], head_orientation[:, 1:]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
+    filled_data[f'vertical_angle_{eye}_degree'] = get_angles_between_vectors(eye_gaze[:, [1, 2]], head_orientation[:, [1, 2]]) # pega a componente vertical da diferença angular (ou seja projeta o vetor no plano y,z)
 
     # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
     filled_data[f'horizontal_angle_{eye}_degree'] = get_angles_between_vectors(eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
 
     # remove outliers and smooth data
     filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_ocular_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'vertical_angle_{eye}_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'horizontal_angle_{eye}_degree', outlier_top_threshold=0.01, window_size=10)
 
     filled_data.to_csv(f"{save_path}/{eye}_angles.csv", index=False)
 
@@ -203,8 +206,8 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
     if verbose:
         print("Data for the plot filtered")
    
-    process_eye_movement_range(gaze_data, 'left', save_path)
-    process_eye_movement_range(gaze_data, 'right', save_path)
+    process_eye_movement_range(gaze_data.copy(), 'left', save_path)
+    process_eye_movement_range(gaze_data.copy(), 'right', save_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate visualizations for eye tracking data')
