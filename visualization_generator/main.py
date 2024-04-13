@@ -94,11 +94,13 @@ def generate_eye_fixation_visualization(data_df, save_path="visualizations"):
     process_eye_fixation_data(pupil_data, 'left', save_path)
     process_eye_fixation_data(pupil_data, 'right', save_path)
 
-def remove_outliers_and_smooth_data(data, column_name, outlier_top_threshold=0.01, window_size=10):
+def remove_outliers_and_smooth_data(data, column_name, outlier_top_threshold=0.01 , window_size=10,  outlier_bottom_threshold = None):
     # remove outliers and smooth data
     # outliers in this context are the top N% of the data
     # the remotion will be done nullifying the values and then using the ffill method to fill the null values
     data.loc[data[column_name] > data[column_name].quantile(1 - outlier_top_threshold), column_name] = None
+    if outlier_bottom_threshold is not None:
+        data.loc[data[column_name] < data[column_name].quantile(outlier_bottom_threshold), column_name] = None
     data = data.ffill()
 
     # smooth the data using a rolling mean
@@ -177,9 +179,9 @@ def process_eye_movement_range(data, eye, save_path):
     filled_data[f'horizontal_angle_{eye}_degree'] = get_angles_between_vectors(eye_gaze[:, [0, 2]], head_orientation[:, [0, 2]]) # pega a componente horizontal da diferença angular (ou seja projeta o vetor no plano x,z)
 
     # remove outliers and smooth data
-    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_ocular_degree', outlier_top_threshold=0.01, window_size=10)
-    filled_data = remove_outliers_and_smooth_data(filled_data, f'vertical_angle_{eye}_degree', outlier_top_threshold=0.01, window_size=10)
-    filled_data = remove_outliers_and_smooth_data(filled_data, f'horizontal_angle_{eye}_degree', outlier_top_threshold=0.01, window_size=10)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_ocular_degree', outlier_top_threshold=0.01, window_size=10, outlier_bottom_threshold=0.01)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'vertical_angle_{eye}_degree', outlier_top_threshold=0.01, window_size=10, outlier_bottom_threshold=0.01)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'horizontal_angle_{eye}_degree', outlier_top_threshold=0.01, window_size=10, outlier_bottom_threshold=0.01)
 
     filled_data.to_csv(f"{save_path}/{eye}_angles.csv", index=False)
 
