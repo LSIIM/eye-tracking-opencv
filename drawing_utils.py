@@ -5,16 +5,16 @@ import pandas as pd
 
 from definitions import *
 
-def draw_eye_gaze(image, left_pupil, left_gaze, right_pupil, right_gaze):
-    if(left_pupil == 0 or right_pupil == 0 or left_pupil == None or right_pupil == None):
+def draw_eye_gaze(image, left_iris, left_gaze, right_iris, right_gaze):
+    if(left_iris == 0 or right_iris == 0 or left_iris == None or right_iris == None):
         return image
-    left_pupil_pos, left_pupil_radius = left_pupil
-    right_pupil_pos, right_pupil_radius = right_pupil
+    left_iris_pos, left_iris_radius = left_iris
+    right_iris_pos, right_iris_radius = right_iris
 
     if left_gaze is not None:
         left_gaze_x, left_gaze_y = left_gaze
 
-        p1_left = (int(left_pupil_pos[0]), int(left_pupil_pos[1]))
+        p1_left = (int(left_iris_pos[0]), int(left_iris_pos[1]))
         p2_left = (int(left_gaze[0]), int(left_gaze[1]))
 
         image = cv2.line(image, p1_left, p2_left, (0, 0, 255), 2)
@@ -22,7 +22,7 @@ def draw_eye_gaze(image, left_pupil, left_gaze, right_pupil, right_gaze):
     
     if right_gaze is not None:
         right_gaze_x, right_gaze_y = right_gaze
-        p1_right = (int(right_pupil_pos[0]), int(right_pupil_pos[1]))
+        p1_right = (int(right_iris_pos[0]), int(right_iris_pos[1]))
         p2_right = (int(right_gaze[0]), int(right_gaze[1]))
 
         image = cv2.line(image, p1_right, p2_right, (0, 0, 255), 2)

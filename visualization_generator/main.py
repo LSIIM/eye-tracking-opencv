@@ -49,7 +49,7 @@ import numpy as np
 verbose = False
 
 def draw_fixation_visualization(data_df, eye, save_path):
-    fig = px.line(data_df, x='frame', y=[f'{eye}_pupil_x', f'{eye}_pupil_y'], title=f'{eye} eye fixation')
+    fig = px.line(data_df, x='frame', y=[f'{eye}_iris_x', f'{eye}_iris_y'], title=f'{eye} eye fixation')
     fig.write_image(f"{save_path}/{eye}_eye_fixation.png", width=1000, height=500, format='png', engine='kaleido')
 
     if verbose:
@@ -61,19 +61,19 @@ def process_eye_fixation_data(data, eye, save_path):
     if verbose:
         print(f'{eye} data filled')
 
-    # Adjust gaze vectors based on pupil positions
-    filled_data[f'{eye}_pupil_x'] -= filled_data[f'nose_tip_x']
-    filled_data[f'{eye}_pupil_y'] -= filled_data[f'nose_tip_y']
+    # Adjust gaze vectors based on iris positions
+    filled_data[f'{eye}_iris_x'] -= filled_data[f'nose_tip_x']
+    filled_data[f'{eye}_iris_y'] -= filled_data[f'nose_tip_y']
 
     # move the data so the mean is 0
-    filled_data[f'{eye}_pupil_x'] -= filled_data[f'{eye}_pupil_x'].mean()
-    filled_data[f'{eye}_pupil_y'] -= filled_data[f'{eye}_pupil_y'].mean()
+    filled_data[f'{eye}_iris_x'] -= filled_data[f'{eye}_iris_x'].mean()
+    filled_data[f'{eye}_iris_y'] -= filled_data[f'{eye}_iris_y'].mean()
 
     # remove outliers and smooth data
-    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_pupil_x', outlier_top_threshold=0.001, window_size=3)
-    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_pupil_y', outlier_top_threshold=0.001, window_size=3)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_iris_x', outlier_top_threshold=0.001, window_size=3)
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_iris_y', outlier_top_threshold=0.001, window_size=3)
 
-    filled_data.to_csv(f"{save_path}/{eye}_pupil_position.csv", index=False)
+    filled_data.to_csv(f"{save_path}/{eye}_iris_position.csv", index=False)
 
     draw_fixation_visualization(filled_data, eye, save_path)
 
@@ -87,12 +87,12 @@ def generate_eye_fixation_visualization(data_df, save_path="visualizations"):
         print(data_df.head())
 
     # get only the data needed for the plot (only pupil)
-    pupil_data = data_df[['frame', 'left_pupil_x', 'left_pupil_y', 'right_pupil_x', 'right_pupil_y', 'nose_tip_x', 'nose_tip_y']]
+    iris_data = data_df[['frame', 'left_iris_x', 'left_iris_y', 'right_iris_x', 'right_iris_y', 'nose_tip_x', 'nose_tip_y']]
 
     if(verbose):
         print("Data for the plot filtered")
-    process_eye_fixation_data(pupil_data, 'left', save_path)
-    process_eye_fixation_data(pupil_data, 'right', save_path)
+    process_eye_fixation_data(iris_data, 'left', save_path)
+    process_eye_fixation_data(iris_data, 'right', save_path)
 
 def remove_outliers_and_smooth_data(data, column_name, outlier_top_threshold=0.01 , window_size=10,  outlier_bottom_threshold = None):
     # remove outliers and smooth data
@@ -113,7 +113,6 @@ def get_angles_between_vectors(v1, v2):
     # v1 and v2 are numpy arrays
     # the angle is in degrees
 
-    # <u,v> = x1*x2 + y1*y2 + z1*z2
     # |v| = sqrt(x2^2 + y2^2 + z2^2)
     # <u,v> = cos(phi) * |u| * |v|
     # cos(phi) = <u,v> / (|u| * |v|) = (x1*x2 + y1*y2 + z1*z2 )/ sqrt(x1^2 + y1^2 + z1^2) * sqrt(x2^2 + y2^2 + z2^2)
@@ -211,6 +210,47 @@ def generate_ocular_movement_range_vizualization(data, save_path="visualizations
     process_eye_movement_range(gaze_data.copy(), 'left', save_path)
     process_eye_movement_range(gaze_data.copy(), 'right', save_path)
 
+
+def draw_pupil_to_iris_ratio_visualization(data_df, eye, save_path):
+    fig = px.line(data_df, x='frame', y=[f'{eye}_pupil_to_iris_ratio'], title=f'{eye} pupil to iris ratio')
+    fig.write_image(f"{save_path}/{eye}_pupil_to_iris_ratio.png", width=1000, height=500, format='png', engine='kaleido')
+
+    if verbose:
+        print(f"{eye} pupil to iris ratio plot saved")
+
+def process_eye_pupil_ratio(ratio_data, eye, save_path):
+    filled_data = ratio_data.ffill()
+    if verbose:
+        print(f'{eye} data filled')
+        print(filled_data.head())
+
+    filled_data[f'{eye}_pupil_to_iris_ratio'] = np.divide(filled_data[f'{eye}_pupil_r'], filled_data[f'{eye}_iris_r'])
+
+    filled_data.to_csv(f"{save_path}/{eye}_pupil_to_iris_ratio.csv", index=False)
+
+    # remove outliers and smooth data
+    filled_data = remove_outliers_and_smooth_data(filled_data, f'{eye}_pupil_to_iris_ratio', outlier_top_threshold=0.01, window_size=10)
+
+    draw_pupil_to_iris_ratio_visualization(filled_data, eye, save_path)
+
+def generate_pupil_to_iris_ratio(data, save_path):
+    # create a line plot for the ratio of the pupil and iris through time
+    
+    if verbose:
+        print("Generating pupil to iris ratio visualization")
+        print("Saving in:", save_path)
+        print("Data columns:", data.columns)
+        print(data.head())
+
+    # get only the data needed for the plot
+    ratio_data = data[['frame', 'left_pupil_r', 'left_iris_r', 'right_pupil_r', 'right_iris_r']]
+
+    if verbose:
+        print("Data for the plot filtered")
+    process_eye_pupil_ratio(ratio_data.copy(), 'left', save_path)
+    process_eye_pupil_ratio(ratio_data, 'right', save_path)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate visualizations for eye tracking data')
     parser.add_argument('data_path', type=str, help='path to the csv file with the data')
@@ -229,6 +269,7 @@ if __name__ == "__main__":
         os.makedirs(f"{save_path}")
 
     
-    generate_eye_fixation_visualization(data_df, save_path)
-    generate_ocular_movement_range_vizualization(data_df, save_path)
+    generate_eye_fixation_visualization(data_df.copy(), save_path)
+    generate_ocular_movement_range_vizualization(data_df.copy(), save_path)
+    generate_pupil_to_iris_ratio(data_df.copy(), save_path)
     

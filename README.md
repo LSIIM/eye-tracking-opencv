@@ -96,7 +96,7 @@ Define se o vetor de direção da cabeça vai ser mostrado
 Define se os vetores de direção do olhar de ambos os olhos vão ser mostrados
 
 - Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
+- Valor padrão: n   
 
 #### -showwarn
 

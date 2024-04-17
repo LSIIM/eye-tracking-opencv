@@ -135,7 +135,7 @@ def process_video(path):
                 if (global_options['draw_head_orientation']):
                     frame = draw_head_orientation(frame, face_info.head_orientation_vector, face_info.nose_2d)
                 if(global_options['draw_eye_gaze']):
-                    frame = draw_eye_gaze(frame, face_info.left_pupil, face_info.left_eye_gaze, face_info.right_pupil, face_info.right_eye_gaze)
+                    frame = draw_eye_gaze(frame, face_info.left_iris, face_info.left_eye_gaze, face_info.right_iris, face_info.right_eye_gaze)
             else:
                 face_not_found_counter += 1
 
