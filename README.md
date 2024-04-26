@@ -129,3 +129,10 @@ Define o caminho para os arquivos.
 `python main.py -showprocess s -drawbb n -path "./meus_arquivos"`
 
 > Nota: Se um argumento inválido for fornecido para uma opção, o script imprimirá uma mensagem de erro e encerrará sua execução.
+
+## Como rodar o gerador de visualizações
+
+`python visualization_generator/main.py <path to the csv file with the extracted data> [optional --verbose]`
+
+Isso vai criar uma pasta visualizations na mesma pasta do arquivo csv que você passou e la dentro irá salvar as visualizações
+
