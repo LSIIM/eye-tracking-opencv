@@ -11,7 +11,7 @@ Com a imagem correspondente a cada olho foi-se feite uma analise de histograma d
 - Python 3.9
 - pipenv
 
-## Como rodar
+## Como rodar o extrator de dados
 
 Eu utilizo o gerenciador de pacotes pipenv, caso não o tenha instalado execute `pip install pipenv`
 
@@ -129,3 +129,9 @@ Define o caminho para os arquivos.
 `python main.py -showprocess s -drawbb n -path "./meus_arquivos"`
 
 > Nota: Se um argumento inválido for fornecido para uma opção, o script imprimirá uma mensagem de erro e encerrará sua execução.
+
+## Como rodar o gerador de visualizações
+
+`python visualization_generator/main.py <path to the csv file with the extracted data> [optional --verbose]`
+
+Isso vai criar uma pasta visualizations na mesma pasta do arquivo csv que você passou e la dentro irá salvar as visualizações
