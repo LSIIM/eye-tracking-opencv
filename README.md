@@ -21,18 +21,11 @@ Para rodar o programa:
 - `pipenv install`
 - `python main.py [argumentos]`
 
-## Criar o executavel
-
-```
-pipenv run pyinstaller --onefile --paths [seu_caminho] ./main.py --add-data '[seu_caminho]\Lib\site-packages\mediapipe\modules:mediapipe/modules' --add-data '[seu_caminho]\Lib\site-packages\mediapipe\python\solutions:mediapipe/solutions'
-
-```
-
-Substitua [seu_caminho] pelo caminho apropriado do seu ambiente.
 
 ## Regras
 
 PROIBIDO colocar pastas que contenham o caractere '.' no nome dentro do diretório /raw para o processamento em lote
+OS VIDEOS TEM QUE SE CHAMAR `record.avi` OU `record.mp4`
 
 ## Documentação de Argumentos CLI
 
@@ -136,3 +129,12 @@ Define o caminho para os arquivos.
 
 Isso vai criar uma pasta visualizations na mesma pasta do arquivo csv que você passou e la dentro irá salvar as visualizações
 
+
+## Criar o executavel
+
+```
+pipenv run pyinstaller --onefile --paths [seu_caminho] ./main.py --add-data '[seu_caminho]\Lib\site-packages\mediapipe\modules:mediapipe/modules' --add-data '[seu_caminho]\Lib\site-packages\mediapipe\python\solutions:mediapipe/solutions'
+
+```
+
+Substitua [seu_caminho] pelo caminho apropriado do seu ambiente.
