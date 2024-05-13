@@ -1,140 +1,70 @@
 # eye-tracking-opencv
 
-Os códigos dentro da pasta `teste_de_conceito` são testes que foram executados para avaliar a viabilidade de diversas formas de implementação das soluções propostas.
+The code within the `teste_de_conceito` folder consists of tests conducted to assess the feasibility of various implementation methods for the proposed solutions.
 
-A combinação que teve o melhor resultado foi analisar o rosto com o mediapipe e extrair os 468 landmarks dele e, a partir destes landmarks, selecionar a região dos olhos.
+The combination that yielded the best results involved analyzing the face with MediaPipe and extracting the 468 landmarks. From these landmarks, the eye region was selected.
 
-Com a imagem correspondente a cada olho foi-se feite uma analise de histograma das cores da imagem, apos alguns filtros serem aplicados, para tentar analisar onde estavam a iris e a pupila. O resultado foi que a pupia é razoavelmente fácil e consistente de se obter, contudo, a iris não. Por conta disso será adicionada mais uma etapa no processo de analise, com um outro algorítimo da mediapipe, o qual extrai a posição da iris de um rosto.
+For each eye's corresponding image, a histogram analysis of the image colors was performed after applying some filters to attempt to determine the positions of the iris and pupil. The result was that the pupil is reasonably easy and consistent to obtain, however, the iris is not. Therefore, an additional step will be added to the analysis process using another MediaPipe algorithm that extracts the iris position from a face.
 
-## Pré-requisitos
+## Prerequisites
 
 - Python 3.9
 - pipenv
 
-## Como rodar
+## How to Run
 
-Eu utilizo o gerenciador de pacotes pipenv, caso não o tenha instalado execute `pip install pipenv`
+I use the `pipenv` package manager. If you do not have it installed, run `pip install pipenv`.
 
-Para rodar o programa:
+To execute the program:
 
 - `pipenv shell`
 - `pipenv install`
-- `python main.py [argumentos]`
+- `python main.py [arguments]`
 
+## Rules
 
-## Regras
+It is FORBIDDEN to place folders containing the '.' character in their name inside the /raw directory for batch processing.
+THE VIDEOS MUST BE NAMED `record.avi` OR `record.mp4`.
 
-PROIBIDO colocar pastas que contenham o caractere '.' no nome dentro do diretório /raw para o processamento em lote
-OS VIDEOS TEM QUE SE CHAMAR `record.avi` OU `record.mp4`
+## CLI Arguments Documentation
 
-## Documentação de Argumentos CLI
+### Description
 
-### Descrição
+The script accepts several command-line arguments to configure its global options. Below are the available options and their descriptions.
 
-O script aceita vários argumentos de linha de comando para configurar suas opções globais. Abaixo estão as opções disponíveis e suas descrições.
+### Arguments
 
-### Argumentos
+|  Argument &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;          | Description                                     | Accepted Values | Default Value |
+|-------------------|-------------------------------------------------|-----------------|---------------|
+| `-showprocess`    | Defines whether the process will be displayed.  | s (yes), n (no) | n             |
+| `-drawbb`         | Defines whether the bounding box will be drawn. | s (yes), n (no) | n             |
+| `-drawir`         | Defines whether the iris will be drawn.         | s (yes), n (no) | n             |
+| `-drawpu`         | Defines whether the pupil will be drawn.        | s (yes), n (no) | n             |
+| `-drawpp`         | Defines whether the passed positions will be drawn. | s (yes), n (no) | s           |
+| `-drawmp`         | Defines whether the mask points will be drawn.  | s (yes), n (no) | n             |
+| `-drawheadpose`   | Defines whether the head direction vector will be shown. | s (yes), n (no) | n           |
+| `-draweyegaze`    | Defines whether the gaze direction vectors of both eyes will be shown. | s (yes), n (no) | n          |
+| `-showwarn`       | Defines whether warnings will be displayed.     | s (yes), n (no) | s             |
+| `-multicore`      | Defines whether multicore processing will be used. | s (yes), n (no) | n            |
+| `-overwrite`      | Defines whether existing files will be overwritten. If `-multicore` is s, the default is s. Otherwise, it is n. | s (yes), n (no) | n          |
+| `-path`           | Defines the path to the files.                  |       string          | "./vds"       |
 
-#### -showprocess
-
-Define se o processo será mostrado.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -drawbb
-
-Define se a bounding box será desenhada.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -drawir
-
-Define se a íris será desenhada.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -drawpu
-
-Define se a pupila será desenhada.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -drawpp
-
-Define se as posições passadas serão desenhadas.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: s
-
-#### -drawmp
-
-Define se os pontos da máscara serão desenhados.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -drawheadpose
-
-Define se o vetor de direção da cabeça vai ser mostrado
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -draweyegaze
-
-Define se os vetores de direção do olhar de ambos os olhos vão ser mostrados
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n   
-
-#### -showwarn
-
-Define se os avisos serão mostrados.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: s
-
-#### -multicore
-
-Define se o processamento multicore será usado.
-
-- Valores aceitos: s (sim) ou n (não)
-- Valor padrão: n
-
-#### -overwrite
-
-Define se os arquivos existentes serão sobrescritos. Se -multicore for s, o valor padrão é s. Caso contrário, o valor padrão é n.
-
-- Valores aceitos: s (sim) ou n (não)
-
-#### -path
-
-Define o caminho para os arquivos.
-
-- Valor padrão: ""./vds"
-
-##### Exemplo de Uso
+#### Usage Example
 
 `python main.py -showprocess s -drawbb n -path "./meus_arquivos"`
 
-> Nota: Se um argumento inválido for fornecido para uma opção, o script imprimirá uma mensagem de erro e encerrará sua execução.
+> Note: If an invalid argument is provided for an option, the script will print an error message and terminate its execution.
 
-## Como rodar o gerador de visualizações
+## How to Run the Visualization Generator
 
 `python visualization_generator/main.py <path to the csv file with the extracted data> [optional --verbose]`
 
-Isso vai criar uma pasta visualizations na mesma pasta do arquivo csv que você passou e la dentro irá salvar as visualizações
+This will create a `visualizations` folder in the same directory as the csv file you provided, and it will save the visualizations inside.
 
-
-## Criar o executavel
-
-```
-pipenv run pyinstaller --onefile --paths [seu_caminho] ./main.py --add-data '[seu_caminho]\Lib\site-packages\mediapipe\modules:mediapipe/modules' --add-data '[seu_caminho]\Lib\site-packages\mediapipe\python\solutions:mediapipe/solutions'
+## Creating the Executable
 
 ```
+pipenv run pyinstaller --onefile --paths [your_path] ./main.py --add-data '[your_path]\Lib\site-packages\mediapipe\modules:mediapipe/modules' --add-data '[your_path]\Lib\site-packages\mediapipe\python\solutions:mediapipe/solutions'
+```
 
-Substitua [seu_caminho] pelo caminho apropriado do seu ambiente.
+Replace `[your_path]` with the appropriate path for your environment.
