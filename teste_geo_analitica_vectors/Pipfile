@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opencv-python = "*"
+numpy = "*"
+mediapipe = "*"
+tqdm = "*"
+scipy = "*"
+pandas = "*"
+plotly = "*"
+kaleido = "==0.1.0post1"
+ipywidgets = "==7"
+dash = "*"
+
+[dev-packages]
+pyinstaller = "*"
+
+[requires]
+python_version = "3.9"
